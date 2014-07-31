@@ -1,4 +1,3 @@
-s-ramp-tck
-==========
+S-RAMP V1.0 Technical Compatibility Kit
 
-S-RAMP TCK
+Tests that can be used to run against an S-RAMP implementation to prove Technical Compatibility.
