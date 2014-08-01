@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:tns="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:s-ramp="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+            elementFormDefault="qualified" version="1.0">
+  
+<!--
+
+	S-RAMP Version 1.0
+	Committee Specification Draft 01 / Public Review Draft 01
+	08 April 2013
+	Source: http://docs.oasis-open.org/s-ramp/s-ramp/v1.0/csprd01/schemas/
+       
+  Copyright (c) OASIS Open 2013. All rights reserved.
+      
+  Portions may also be Copyright © 2010 Hewlett-Packard Company (HP),
+  International Business Machines Corporation (IBM), Software AG (SAG)
+  and TIBCO Software Inc.
+       
+-->
+  
+  <xsd:include schemaLocation="coremodel.xsd" />
+
+  <xsd:simpleType name="xsdDocumentEnum">
+    <xsd:restriction base="s-ramp:baseArtifactEnum">
+      <xsd:enumeration value="XsdDocument" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="XsdDocument">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:XmlDocument">
+        <xsd:sequence>
+          <!-- Derived Relationships with (other)XmlDocument artifact(s): -->
+          <xsd:element name="importedXsds" type="s-ramp:xsdDocumentTarget" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="includedXsds" type="s-ramp:xsdDocumentTarget" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="redefinedXsds" type="s-ramp:xsdDocumentTarget" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="targetNamespace" type="xsd:anyURI" use="optional" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="AttributeDeclaration">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:DerivedArtifactType">
+        <xsd:attribute name="NCName" type="xsd:NCName" />
+        <xsd:attribute name="namespace" type="xsd:anyURI" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ElementDeclaration">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:DerivedArtifactType">
+        <xsd:attribute name="NCName" type="xsd:NCName" />
+        <xsd:attribute name="namespace" type="xsd:anyURI" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="XsdType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:DerivedArtifactType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ComplexTypeDeclaration">
+    <xsd:complexContent>
+      <xsd:extension base="tns:XsdType">
+        <xsd:attribute name="NCName" type="xsd:NCName" />
+        <xsd:attribute name="namespace" type="xsd:anyURI" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="SimpleTypeDeclaration">
+    <xsd:complexContent>
+      <xsd:extension base="tns:XsdType">
+        <xsd:attribute name="NCName" type="xsd:NCName" />
+        <xsd:attribute name="namespace" type="xsd:anyURI" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!-- Relationship referencing the artifact's UUID, to reference an XsdDocument. -->
+  <xsd:complexType name="xsdDocumentTarget">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:target">
+        <xsd:attribute name="artifactType" type="s-ramp:xsdDocumentEnum" use="required" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

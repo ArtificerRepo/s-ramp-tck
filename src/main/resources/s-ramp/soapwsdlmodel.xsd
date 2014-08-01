@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:tns="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:s-ramp="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+            elementFormDefault="qualified" version="1.0">
+  
+<!--
+
+	S-RAMP Version 1.0
+	Committee Specification Draft 01 / Public Review Draft 01
+	08 April 2013
+	Source: http://docs.oasis-open.org/s-ramp/s-ramp/v1.0/csprd01/schemas/
+       
+  Copyright (c) OASIS Open 2013. All rights reserved.
+      
+  Portions may also be Copyright © 2010 Hewlett-Packard Company (HP),
+  International Business Machines Corporation (IBM), Software AG (SAG)
+  and TIBCO Software Inc.
+       
+-->
+  
+  <xsd:include schemaLocation="coremodel.xsd" />
+  <xsd:include schemaLocation="wsdlmodel.xsd" />
+
+  <xsd:complexType name="SoapAddress">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:WsdlExtension">
+        <xsd:attribute name="soapLocation" type="xsd:anyURI" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="SoapBinding">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:WsdlExtension">
+        <xsd:attribute name="style" type="xsd:string" />
+        <xsd:attribute name="transport" type="xsd:string" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:tns="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:s-ramp="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0" 
+  elementFormDefault="qualified" version="1.0">
+  
+<!--
+
+	S-RAMP Version 1.0
+	Committee Specification Draft 01 / Public Review Draft 01
+	08 April 2013
+	Source: http://docs.oasis-open.org/s-ramp/s-ramp/v1.0/csprd01/schemas/
+       
+  Copyright (c) OASIS Open 2013. All rights reserved.
+      
+  Portions may also be Copyright © 2010 Hewlett-Packard Company (HP),
+  International Business Machines Corporation (IBM), Software AG (SAG)
+  and TIBCO Software Inc.
+       
+       -->
+  
+  <xsd:include schemaLocation="coremodel.xsd" />
+
+  <xsd:simpleType name="policyExpressionEnum">
+    <xsd:restriction base="s-ramp:derivedArtifactEnum">
+      <xsd:enumeration value="PolicyExpression" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="PolicyAttachment">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:DerivedArtifactType">
+        <xsd:sequence>
+          <!-- Derived Relationship to any other artifact (BaseArtifactType): -->
+          <xsd:element name="appliesTo" type="s-ramp:baseArtifactTarget" minOccurs="1" maxOccurs="unbounded" />
+          <!-- Derived Relationship to a Policy Expression artifact: -->
+          <xsd:element name="policies" type="s-ramp:policyExpressionTarget" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="PolicyExpression">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:DerivedArtifactType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="PolicyDocument">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:XmlDocument" />
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!-- Relationship referencing the artifact's UUID, to reference a PolicyExpressionArtifact. -->
+  <xsd:complexType name="policyExpressionTarget">
+    <xsd:complexContent>
+      <xsd:extension base="s-ramp:target">
+        <xsd:attribute name="artifactType" type="s-ramp:policyExpressionEnum" use="required" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>
