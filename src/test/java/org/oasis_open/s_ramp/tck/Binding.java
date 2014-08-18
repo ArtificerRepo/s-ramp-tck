@@ -30,5 +30,11 @@ public abstract class Binding {
     
     public abstract BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception;
     
-    public abstract void delete(BaseArtifactType artifact) throws Exception;
+    public abstract BaseArtifactType createArtifact(BaseArtifactType artifact) throws Exception;
+    
+    public abstract void deleteAll() throws Exception;
+    
+    public abstract String getUrl(BaseArtifactType artifact);
+    
+    public abstract String getUrl(ArtifactType artifactType);
 }

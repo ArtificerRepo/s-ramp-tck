@@ -15,14 +15,18 @@
  */
 package org.oasis_open.s_ramp.tck.foundation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactEnum;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
+import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
 import org.oasis_open.s_ramp.tck.BindingFactory;
 
@@ -33,8 +37,6 @@ import org.oasis_open.s_ramp.tck.BindingFactory;
 public abstract class AbstractTest {
     
     protected final Binding binding;
-    
-    protected final List<BaseArtifactType> createdArtifacts = new ArrayList<BaseArtifactType>();
     
     @Parameters
     public static List<Binding[]> bindings() {
@@ -47,10 +49,26 @@ public abstract class AbstractTest {
     
     @After
     public void cleanup() throws Exception {
-        for (BaseArtifactType createdArtifact : createdArtifacts) {
-            binding.delete(createdArtifact);
-        }
-        createdArtifacts.clear();
+        binding.deleteAll();
+    }
+    
+    protected final static ServiceInstance ServiceInstance() throws Exception {
+        return new ServiceInstance();
+    }
+    protected final static WsdlDocument WsdlDocument() throws Exception {
+        WsdlDocument artifact = (WsdlDocument) ArtifactType.WsdlDocument().newArtifactInstance();
+        artifact.setArtifactType(BaseArtifactEnum.WSDL_DOCUMENT);
+        return artifact;
+    }
+    protected final static XsdDocument XsdDocument() throws Exception {
+        XsdDocument artifact = (XsdDocument) ArtifactType.XsdDocument().newArtifactInstance();
+        artifact.setArtifactType(BaseArtifactEnum.XSD_DOCUMENT);
+        return artifact;
+    }
+    protected final static ExtendedDocument ExtendedDocument(String extendedType) throws Exception {
+        ExtendedDocument artifact = (ExtendedDocument) ArtifactType.ExtendedDocument(extendedType).newArtifactInstance();
+        artifact.setArtifactType(BaseArtifactEnum.EXTENDED_DOCUMENT);
+        return artifact;
     }
 
 }

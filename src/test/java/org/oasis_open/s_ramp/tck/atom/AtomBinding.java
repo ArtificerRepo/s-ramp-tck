@@ -15,6 +15,8 @@
  */
 package org.oasis_open.s_ramp.tck.atom;
 
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,8 +28,8 @@ import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -40,6 +42,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartRelatedOutput;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
+import org.oasis_open.s_ramp.tck.MediaType;
 
 /**
  * @author Brett Meyer
@@ -48,6 +51,9 @@ public class AtomBinding extends Binding {
     
 //    private static final String BASE_URL = System.getProperty("password");
     private static final String BASE_URL = "http://localhost:8080/s-ramp-server";
+
+    private static final QName DERIVED_QNAME = new QName(
+            "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0", "derived", "s-ramp");
 
     @Override
     public List<BaseArtifactType> query(String query) throws Exception {
@@ -70,10 +76,8 @@ public class AtomBinding extends Binding {
 
     @Override
     public BaseArtifactType upload(ArtifactType artifactType, String filePath) throws Exception {
-        String type = artifactType.getType();
-        String atomUrl = String.format("%1$s/%2$s/%3$s", "/s-ramp", //$NON-NLS-1$
-                artifactType.getArtifactType().getModel(), type);
-        Builder clientRequest = getClientRequest(BASE_URL + atomUrl);
+        String atomUrl = getUrl(artifactType);
+        Builder clientRequest = getClientRequest(atomUrl);
         
         InputStream is = this.getClass().getResourceAsStream(filePath);
         String text = convertStreamToString(is);
@@ -83,7 +87,7 @@ public class AtomBinding extends Binding {
         clientRequest.header("Slug", fileName); //$NON-NLS-1$
 
         Response response = clientRequest.post(Entity.entity(text, artifactType.getMimeType()));
-
+        checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
@@ -91,9 +95,7 @@ public class AtomBinding extends Binding {
     @Override
     public BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
-        String type = artifactType.getType();
-        String atomUrl = String.format("%1$s/%2$s/%3$s", BASE_URL + "/s-ramp", //$NON-NLS-1$
-                artifactType.getArtifactType().getModel(), type);
+        String atomUrl = getUrl(artifactType);
         Builder clientRequest = getClientRequest(atomUrl);
 
         MultipartRelatedOutput output = new MultipartRelatedOutput();
@@ -108,27 +110,56 @@ public class AtomBinding extends Binding {
         InputStream is = this.getClass().getResourceAsStream(filePath);
         String text = convertStreamToString(is);
         is.close();
-        MediaType mediaType2 = MediaType.valueOf(artifactType.getMimeType());
-        output.addPart(text, mediaType2);
+        output.addPart(text, MediaType.valueOf(artifactType.getMimeType()));
 
         //3. Send the request
         Response response = clientRequest.post(Entity.entity(output, MultipartConstants.MULTIPART_RELATED));
+        checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
     
     @Override
-    public void delete(BaseArtifactType artifact) throws Exception {
-        ArtifactType type = ArtifactType.valueOf(artifact);
-        String artifactModel = type.getArtifactType().getModel();
-        String artifactType = type.getArtifactType().getType();
-        if ("ext".equals(type.getArtifactType().getModel()) && type.getExtendedType()!=null) { //$NON-NLS-1$
-            artifactType = type.getExtendedType();
-        }
-        String atomUrl = String.format("%1$s/%2$s/%3$s/%4$s", BASE_URL + "/s-ramp", artifactModel, artifactType,
-                artifact.getUuid()); //$NON-NLS-1$
+    public BaseArtifactType createArtifact(BaseArtifactType artifact) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        String atomUrl = getUrl(artifactType);
+        
         Builder clientRequest = getClientRequest(atomUrl);
-        clientRequest.delete();
+        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+                MediaType.APPLICATION_ATOM_XML_ENTRY));
+        checkResponse(response);
+        Entry entry = response.readEntity(Entry.class);
+        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+    }
+    
+    @Override
+    public void deleteAll() throws Exception {
+        Feed feed = getFeed("/s-ramp?query=/s-ramp&startIndex=0&count=10000");
+        for (Entry entry : feed.getEntries()) {
+            // Delete all primary artifacts
+            if (entry.getExtensionAttributes().containsKey(DERIVED_QNAME)
+                    && "false".equals(entry.getExtensionAttributes().get(DERIVED_QNAME))) {
+                for (Link link : entry.getLinks()) {
+                    // TODO: Safe assumption for all impls?
+                    if ("self".equals(link.getRel())) {
+                        getClientRequest(link.getHref().toString()).delete();
+                    }
+                }
+            }
+        }
+    }
+    
+    @Override
+    public String getUrl(BaseArtifactType artifact) {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        return getUrl(artifactType);
+    }
+    
+    @Override
+    public String getUrl(ArtifactType artifactType) {
+        String type = artifactType.getType();
+        return String.format("%1$s/%2$s/%3$s", BASE_URL + "/s-ramp", //$NON-NLS-1$
+                artifactType.getArtifactType().getModel(), type);
     }
     
     private Feed getFeed(String endpoint) {
@@ -163,6 +194,12 @@ public class AtomBinding extends Binding {
             return new Scanner(is).useDelimiter("\\A").next(); //$NON-NLS-1$
         } catch (java.util.NoSuchElementException e) {
             return ""; //$NON-NLS-1$
+        }
+    }
+    
+    private void checkResponse(Response response) {
+        if (response.getStatus() != 200) {
+            fail("Server responded with status " + response.getStatus() + ".  Check the logs for issues.");
         }
     }
     
