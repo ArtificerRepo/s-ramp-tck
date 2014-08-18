@@ -15,6 +15,7 @@
  */
 package org.oasis_open.s_ramp.tck.atom;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -54,6 +55,8 @@ public class AtomBinding extends Binding {
 
     private static final QName DERIVED_QNAME = new QName(
             "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0", "derived", "s-ramp");
+    
+    private static final String NAMESPACE = "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0";
 
     @Override
     public List<BaseArtifactType> query(String query) throws Exception {
@@ -89,6 +92,7 @@ public class AtomBinding extends Binding {
         Response response = clientRequest.post(Entity.entity(text, artifactType.getMimeType()));
         checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
+        verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
     
@@ -116,6 +120,7 @@ public class AtomBinding extends Binding {
         Response response = clientRequest.post(Entity.entity(output, MultipartConstants.MULTIPART_RELATED));
         checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
+        verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
     
@@ -129,6 +134,7 @@ public class AtomBinding extends Binding {
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
+        verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
     
@@ -165,21 +171,14 @@ public class AtomBinding extends Binding {
     private Feed getFeed(String endpoint) {
         Builder clientRequest = getClientRequest(BASE_URL + endpoint);
         Feed feed = clientRequest.get(Feed.class);
-        
-        // TODO: Verify using the spec
-        
+        verifyFeed(feed);
         return feed;
-//        String value = response.readEntity(String.class);
-//        feed.close();
-//        return value;
     }
     
     private Entry getArtifact(String url) {
         Builder clientRequest = getClientRequest(url);
         Entry entry = clientRequest.get(Entry.class);
-        
-        // TODO: Verify using the spec
-        
+        verifyEntry(entry);
         return entry;
     }
     
@@ -200,6 +199,25 @@ public class AtomBinding extends Binding {
     private void checkResponse(Response response) {
         if (response.getStatus() != 200) {
             fail("Server responded with status " + response.getStatus() + ".  Check the logs for issues.");
+        }
+    }
+    
+    private void verifyFeed(Feed feed) {
+        for (Object key : feed.getExtensionAttributes().keySet()) {
+            QName qname = (QName) key;
+            // Foundation 1.9
+            assertEquals(NAMESPACE, qname.getNamespaceURI());
+        }
+        for (Entry entry : feed.getEntries()) {
+            verifyEntry(entry);
+      }
+    }
+    
+    private void verifyEntry(Entry entry) {
+        for (Object key : entry.getExtensionAttributes().keySet()) {
+            QName qname = (QName) key;
+            // Foundation 1.9
+            assertEquals(NAMESPACE, qname.getNamespaceURI());
         }
     }
     
