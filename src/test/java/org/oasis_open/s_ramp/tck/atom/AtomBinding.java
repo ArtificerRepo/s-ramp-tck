@@ -57,16 +57,20 @@ public class AtomBinding extends Binding {
             "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0", "derived", "s-ramp");
     
     private static final String NAMESPACE = "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0";
+    
+    @Override
+    public BaseArtifactType get(String uuid, ArtifactType type) throws Exception {
+        String atomUrl = getUrl(type) + "/" + uuid;
+        Entry entry = getArtifact(atomUrl);
+        verifyEntry(entry);
+        return SrampAtomUtils.unwrapSrampArtifact(entry);
+    }
 
     @Override
     public List<BaseArtifactType> query(String query) throws Exception {
         List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
         Feed feed = getFeed(query);
         for (Entry entry : feed.getEntries()) {
-//            artifacts.add(SrampAtomUtils.unwrapSrampArtifact(entry));
-            // TODO: The feed doesn't include sramp:artifact on the entities, so unwrapping doesn't work.  Should
-            // the below be necessary?
-            
             for (Link link : entry.getLinks()) {
                 // TODO: Safe assumption for all impls?
                 if ("self".equals(link.getRel())) {
@@ -87,7 +91,7 @@ public class AtomBinding extends Binding {
         is.close();
 
         String fileName = filePath.substring( filePath.lastIndexOf('/') + 1, filePath.length() );
-        clientRequest.header("Slug", fileName); //$NON-NLS-1$
+        clientRequest.header("Slug", fileName);
 
         Response response = clientRequest.post(Entity.entity(text, artifactType.getMimeType()));
         checkResponse(response);
@@ -107,7 +111,7 @@ public class AtomBinding extends Binding {
         //1. Add first part, the S-RAMP entry
         Entry atomEntry = SrampAtomUtils.wrapSrampArtifact(artifact);
 
-        MediaType mediaType = new MediaType("application", "atom+xml"); //$NON-NLS-1$ //$NON-NLS-2$
+        MediaType mediaType = new MediaType("application", "atom+xml");
         output.addPart(atomEntry, mediaType);
 
         //2. Add second part, the content
@@ -164,7 +168,7 @@ public class AtomBinding extends Binding {
     @Override
     public String getUrl(ArtifactType artifactType) {
         String type = artifactType.getType();
-        return String.format("%1$s/%2$s/%3$s", BASE_URL + "/s-ramp", //$NON-NLS-1$
+        return String.format("%1$s/%2$s/%3$s", BASE_URL + "/s-ramp",
                 artifactType.getArtifactType().getModel(), type);
     }
     
@@ -190,9 +194,9 @@ public class AtomBinding extends Binding {
     
     private String convertStreamToString(java.io.InputStream is) {
         try {
-            return new Scanner(is).useDelimiter("\\A").next(); //$NON-NLS-1$
+            return new Scanner(is).useDelimiter("\\A").next();
         } catch (java.util.NoSuchElementException e) {
-            return ""; //$NON-NLS-1$
+            return "";
         }
     }
     

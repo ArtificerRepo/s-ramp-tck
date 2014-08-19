@@ -40,15 +40,15 @@ public class Test_4_2 extends CoreModelTest {
     public void test_examples() throws Exception {
         // Create with *and* without the name to verify the query works as expected.
         BaseArtifactType artifact = XsdDocument();
-        BaseArtifactType uploadedXsd = binding.upload(artifact, "/PO.xsd"); //$NON-NLS-1$
+        BaseArtifactType uploadedXsd = binding.upload(artifact, "/PO.xsd");
         verifyArtifact(uploadedXsd);
-        artifact.setName("bob"); //$NON-NLS-1$
+        artifact.setName("bob");
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
         artifact = XsdDocument();
         Property property = new Property();
-        property.setPropertyName("someProperty"); //$NON-NLS-1$
-        property.setPropertyValue("high"); //$NON-NLS-1$
+        property.setPropertyName("someProperty");
+        property.setPropertyValue("high");
         artifact.getProperty().add(property);
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
@@ -58,8 +58,8 @@ public class Test_4_2 extends CoreModelTest {
 //        verifyArtifact(binding.createArtifact(artifact));
 //        artifact = ServiceInstance();
 //        property = new Property();
-//        property.setPropertyName("someProperty"); //$NON-NLS-1$
-//        property.setPropertyValue("high"); //$NON-NLS-1$
+//        property.setPropertyName("someProperty");
+//        property.setPropertyValue("high");
 //        verifyArtifact(binding.createArtifact(artifact));
 
         // Create with *and* without the name to verify the query works as expected.
@@ -70,12 +70,12 @@ public class Test_4_2 extends CoreModelTest {
         
         // Create with *and* without the property to verify the query works as expected.
         WsdlDocument wsdlArtifact = WsdlDocument();
-        verifyArtifact(binding.upload(wsdlArtifact, "/sample.wsdl"));
+        verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl"));
         XsdDocumentTarget xsdTarget = new XsdDocumentTarget();
         xsdTarget.setHref(binding.getUrl(uploadedXsd));
         xsdTarget.setValue("foo");
         wsdlArtifact.getIncludedXsds().add(xsdTarget);
-        verifyArtifact(binding.upload(wsdlArtifact, "/sample.wsdl"));
+        verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl"));
         
         // Example 3:  Query Expressions Using Properties
         List<BaseArtifactType> artifacts = binding.query("/s-ramp/xsd/XsdDocument[@someProperty]");

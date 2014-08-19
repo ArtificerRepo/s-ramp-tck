@@ -15,6 +15,7 @@
  */
 package org.oasis_open.s_ramp.tck.foundation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -38,11 +39,24 @@ public abstract class CoreModelTest extends AbstractTest {
     public CoreModelTest(Binding binding) {
         super(binding);
     }
+    
+    protected void verifyArtifacts(List<BaseArtifactType> artifacts, Class<? extends BaseArtifactType> expectedClass) {
+        assertTrue(artifacts.size() > 0);
+        for (BaseArtifactType artifact : artifacts) {
+            verifyArtifact(artifact, expectedClass);
+        }
+    }
 
     protected void verifyArtifacts(List<BaseArtifactType> artifacts) {
+        assertTrue(artifacts.size() > 0);
         for (BaseArtifactType artifact : artifacts) {
             verifyArtifact(artifact);
         }
+    }
+    
+    protected void verifyArtifact(BaseArtifactType artifact, Class<? extends BaseArtifactType> expectedClass) {
+        assertEquals(expectedClass, artifact.getClass());
+        verifyArtifact(artifact);
     }
     
     protected void verifyArtifact(BaseArtifactType artifact) {

@@ -22,7 +22,10 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 /**
  * @author Brett Meyer
  */
+// TODO: Could be an interface if it ends up that there's nothing abstract to provide.
 public abstract class Binding {
+    
+    public abstract BaseArtifactType get(String uuid, ArtifactType type) throws Exception;
     
     public abstract List<BaseArtifactType> query(String query) throws Exception;
     

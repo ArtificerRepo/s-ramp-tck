@@ -34,8 +34,8 @@ public class Test_2_2 extends CoreModelTest {
     public void test_2_2_1_2() throws Exception {
         BaseArtifactType artifact = XsdDocument();
         Property property = new Property();
-        property.setPropertyName("someProperty"); //$NON-NLS-1$
-        property.setPropertyValue("high"); //$NON-NLS-1$
+        property.setPropertyName("someProperty");
+        property.setPropertyValue("high");
         artifact.getProperty().add(property);
         // Try adding a duplicate, but let verifyArtifact ensure that only one instance of the propertyName exists.
         artifact.getProperty().add(property);
