@@ -30,14 +30,14 @@ import org.oasis_open.s_ramp.tck.Binding;
 /**
  * @author Brett Meyer
  */
-public class QueryModelTest extends AbstractTest {
+public class Test_4_2 extends CoreModelTest {
     
-    public QueryModelTest(Binding binding) {
+    public Test_4_2(Binding binding) {
         super(binding);
     }
     
     @Test
-    public void test_foundation_4_2() throws Exception {
+    public void test_examples() throws Exception {
         // Create with *and* without the name to verify the query works as expected.
         BaseArtifactType artifact = XsdDocument();
         BaseArtifactType uploadedXsd = binding.upload(artifact, "/PO.xsd"); //$NON-NLS-1$
