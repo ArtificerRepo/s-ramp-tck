@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocumentTarget;
@@ -42,40 +41,41 @@ public class QueryModelTest extends AbstractTest {
         // Create with *and* without the name to verify the query works as expected.
         BaseArtifactType artifact = XsdDocument();
         BaseArtifactType uploadedXsd = binding.upload(artifact, "/PO.xsd"); //$NON-NLS-1$
+        verifyArtifact(uploadedXsd);
         artifact.setName("bob"); //$NON-NLS-1$
-        binding.upload(artifact, "/PO.xsd");
+        verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
         artifact = XsdDocument();
         Property property = new Property();
         property.setPropertyName("someProperty"); //$NON-NLS-1$
         property.setPropertyValue("high"); //$NON-NLS-1$
         artifact.getProperty().add(property);
-        binding.upload(artifact, "/PO.xsd");
+        verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
         // TODO FAILURE: SRAMP-167
         // Create with *and* without the property to verify the query works as expected.
 //        artifact = ServiceInstance();
-//        binding.createArtifact(artifact);
+//        verifyArtifact(binding.createArtifact(artifact));
 //        artifact = ServiceInstance();
 //        property = new Property();
 //        property.setPropertyName("someProperty"); //$NON-NLS-1$
 //        property.setPropertyValue("high"); //$NON-NLS-1$
-//        binding.createArtifact(artifact);
+//        verifyArtifact(binding.createArtifact(artifact));
 
         // Create with *and* without the name to verify the query works as expected.
         artifact = ArtifactType.ExtendedArtifactType("BpmnDocument", false).newArtifactInstance();
-        binding.createArtifact(artifact);
+        verifyArtifact(binding.createArtifact(artifact));
         artifact.setName("LoanApproval");
-        binding.createArtifact(artifact);
+        verifyArtifact(binding.createArtifact(artifact));
         
         // Create with *and* without the property to verify the query works as expected.
         WsdlDocument wsdlArtifact = WsdlDocument();
-        binding.upload(wsdlArtifact, "/sample.wsdl");
+        verifyArtifact(binding.upload(wsdlArtifact, "/sample.wsdl"));
         XsdDocumentTarget xsdTarget = new XsdDocumentTarget();
         xsdTarget.setHref(binding.getUrl(uploadedXsd));
         xsdTarget.setValue("foo");
         wsdlArtifact.getIncludedXsds().add(xsdTarget);
-        binding.upload(wsdlArtifact, "/sample.wsdl");
+        verifyArtifact(binding.upload(wsdlArtifact, "/sample.wsdl"));
         
         // Example 3:  Query Expressions Using Properties
         List<BaseArtifactType> artifacts = binding.query("/s-ramp/xsd/XsdDocument[@someProperty]");
@@ -119,15 +119,5 @@ public class QueryModelTest extends AbstractTest {
 //        artifacts = binding.query("/s-ramp/wsdl/Message[@name='findRequest']/part");
 //        assertEquals(1, artifacts.size());
 //        verifyArtifacts(artifacts);
-    }
-    
-    private void verifyArtifacts(List<BaseArtifactType> artifacts) {
-        for (BaseArtifactType artifact : artifacts) {
-            verifyArtifact(artifact);
-        }
-    }
-    
-    private void verifyArtifact(BaseArtifactType artifact) {
-        // TODO
     }
 }

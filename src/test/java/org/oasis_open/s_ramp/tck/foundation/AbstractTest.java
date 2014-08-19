@@ -15,14 +15,25 @@
  */
 package org.oasis_open.s_ramp.tck.foundation;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactEnum;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.DocumentArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
@@ -50,6 +61,58 @@ public abstract class AbstractTest {
     @After
     public void cleanup() throws Exception {
         binding.deleteAll();
+    }
+    
+    protected void verifyArtifacts(List<BaseArtifactType> artifacts) {
+        for (BaseArtifactType artifact : artifacts) {
+            verifyArtifact(artifact);
+        }
+    }
+    
+    protected void verifyArtifact(BaseArtifactType artifact) {
+        // Foundation 2.2.1.1
+        assertNotNull(artifact.getArtifactType());
+        stringAssertion(artifact.getCreatedBy());
+        assertNotNull(artifact.getArtifactType());
+        timeAssertion(artifact.getCreatedTimestamp());
+        stringAssertion(artifact.getLastModifiedBy());
+        timeAssertion(artifact.getLastModifiedTimestamp());
+        stringAssertion(artifact.getName());
+        stringAssertion(artifact.getUuid());
+        
+        // Foundation 2.2.1.2, 2.2.1.3
+        List<String> names = new ArrayList<String>();
+        for (Relationship relationship : artifact.getRelationship()) {
+            assertFalse(names.contains(relationship.getRelationshipType()));
+            names.add(relationship.getRelationshipType());
+        }
+        for (Property property : artifact.getProperty()) {
+            assertFalse(names.contains(property.getPropertyName()));
+            names.add(property.getPropertyName());
+        }
+        
+        // Foundation 2.2.2
+        if (artifact instanceof DocumentArtifactType) {
+            DocumentArtifactType document = (DocumentArtifactType) artifact;
+            stringAssertion(document.getContentType());
+            longAssertion(document.getContentSize());
+            stringAssertion(document.getContentHash());
+        }
+    }
+    
+    private void stringAssertion(String s) {
+        assertNotNull(s);
+        assertTrue(s.length() > 0);
+    }
+    
+    private void timeAssertion(XMLGregorianCalendar time) {
+        assertNotNull(time);
+        assertTrue(time.getYear() > 1970);
+    }
+    
+    private void longAssertion(Long n) {
+        assertNotNull(n);
+        assertTrue(n > 0);
     }
     
     protected final static ServiceInstance ServiceInstance() throws Exception {
