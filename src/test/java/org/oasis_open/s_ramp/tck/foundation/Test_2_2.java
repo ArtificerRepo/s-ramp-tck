@@ -59,5 +59,7 @@ public class Test_2_2 extends CoreModelTest {
         artifact.getRelationship().add(relationship);
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
     }
-
+    
+    // TODO: 2.2.2 Documents which have a Derived Model associated with them cannot be updated in the repository.  They must be removed and republished.
+    // TODO: 2.2.2 Documents which are the target of a relationship cannot be deleted.
 }
