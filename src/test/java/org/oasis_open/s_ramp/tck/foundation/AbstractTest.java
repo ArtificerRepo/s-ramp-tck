@@ -28,13 +28,11 @@ import org.junit.After;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactEnum;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.DocumentArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
 import org.oasis_open.s_ramp.tck.ArtifactType;
@@ -115,23 +113,14 @@ public abstract class AbstractTest {
         assertTrue(n > 0);
     }
     
-    protected final static ServiceInstance ServiceInstance() throws Exception {
-        return new ServiceInstance();
-    }
     protected final static WsdlDocument WsdlDocument() throws Exception {
-        WsdlDocument artifact = (WsdlDocument) ArtifactType.WsdlDocument().newArtifactInstance();
-        artifact.setArtifactType(BaseArtifactEnum.WSDL_DOCUMENT);
-        return artifact;
+        return (WsdlDocument) ArtifactType.WsdlDocument().newArtifactInstance();
     }
     protected final static XsdDocument XsdDocument() throws Exception {
-        XsdDocument artifact = (XsdDocument) ArtifactType.XsdDocument().newArtifactInstance();
-        artifact.setArtifactType(BaseArtifactEnum.XSD_DOCUMENT);
-        return artifact;
+        return (XsdDocument) ArtifactType.XsdDocument().newArtifactInstance();
     }
     protected final static ExtendedDocument ExtendedDocument(String extendedType) throws Exception {
-        ExtendedDocument artifact = (ExtendedDocument) ArtifactType.ExtendedDocument(extendedType).newArtifactInstance();
-        artifact.setArtifactType(BaseArtifactEnum.EXTENDED_DOCUMENT);
-        return artifact;
+        return (ExtendedDocument) ArtifactType.ExtendedDocument(extendedType).newArtifactInstance();
     }
 
 }
