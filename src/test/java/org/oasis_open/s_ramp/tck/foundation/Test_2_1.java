@@ -15,6 +15,8 @@
  */
 package org.oasis_open.s_ramp.tck.foundation;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
@@ -40,16 +42,14 @@ public class Test_2_1 extends CoreModelTest {
         
         XsdDocument xsd2 = XsdDocument();
         
-        // create a modeled relationship
-        XsdDocumentTarget importedXsdTarget = new XsdDocumentTarget();
-        importedXsdTarget.setValue(xsdArtifact1.getUuid());
-        importedXsdTarget.setArtifactType(XsdDocumentEnum.XSD_DOCUMENT);
-        xsd2.getImportedXsds().add(importedXsdTarget);
+        XsdDocumentTarget xsdTarget = new XsdDocumentTarget();
+        xsdTarget.setValue(xsdArtifact1.getUuid());
+        xsdTarget.setArtifactType(XsdDocumentEnum.XSD_DOCUMENT);
 
         // create a valid generic relationship w/ a target
         Relationship validRelationship = new Relationship();
         validRelationship.setRelationshipType("similarXsds");
-        validRelationship.getRelationshipTarget().add(importedXsdTarget);
+        validRelationship.getRelationshipTarget().add(xsdTarget);
         xsd2.getRelationship().add(validRelationship);
 
         // create a valid generic relationship w/ no target
@@ -64,9 +64,6 @@ public class Test_2_1 extends CoreModelTest {
         XsdDocument xsd2Artifact = (XsdDocument) binding.upload(xsd2, "/PO.xsd");
         verifyArtifact(xsd2Artifact);
         
-        // TODO FAILURE: SRAMP-547
-//        assertEquals(1, xsd2Artifact.getImportedXsds().size());
-//        assertEquals(xsdArtifact1.getUuid(), xsd2Artifact.getImportedXsds().get(0).getValue());
         // TODO FAILURE: SRAMP-552
 //        assertEquals(2, xsd2Artifact.getRelationship().size());
         
@@ -74,14 +71,21 @@ public class Test_2_1 extends CoreModelTest {
         xsd2.getRelationship().clear();
         Relationship invalidRelationship = new Relationship();
         invalidRelationship.setRelationshipType("importedXsds");
-        invalidRelationship.getRelationshipTarget().add(importedXsdTarget);
+        invalidRelationship.getRelationshipTarget().add(xsdTarget);
         xsd2.getRelationship().add(invalidRelationship);
         
         // TODO FAILURE: SRAMP-551 (either 0 relationships should result, or the upload should fail)
 //        xsd2Artifact = (XsdDocument) binding.upload(xsd2, "/PO.xsd");
 //        verifyArtifact(xsd2Artifact);
         
-        // TODO: test that a derived relationship cannot be created/edited
+        // test that a derived relationship cannot be created/edited
+        xsd2.getImportedXsds().add(xsdTarget);
+        xsd2Artifact = (XsdDocument) binding.upload(xsd2, "/PO.xsd");
+        verifyArtifact(xsd2Artifact);
+        // TODO: Should the upload fail instead?  What does the atom binding spec say?
+        assertEquals(0, xsd2Artifact.getImportedXsds().size());
+        
+        // TODO: Test modeled relationships between soa/serviceimpl after SRAMP-167
     }
 
 }
