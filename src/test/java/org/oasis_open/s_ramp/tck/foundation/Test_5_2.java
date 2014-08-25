@@ -69,7 +69,7 @@ public class Test_5_2 extends CoreModelTest {
     
     @Test
     public void testExtendedModel() throws Exception {
-        BaseArtifactType artifact = binding.createArtifact(ExtendedArtifactType("FooType"));
+        BaseArtifactType artifact = binding.create(ExtendedArtifactType("FooType"));
         verifyArtifact(artifact, ExtendedArtifactType.class);
         artifact = binding.get(artifact.getUuid(), ArtifactType.ExtendedArtifactType("FooType", false));
         verifyArtifact(artifact, ExtendedArtifactType.class);

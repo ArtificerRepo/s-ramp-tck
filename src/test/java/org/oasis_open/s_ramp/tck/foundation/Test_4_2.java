@@ -64,9 +64,9 @@ public class Test_4_2 extends CoreModelTest {
 
         // Create with *and* without the name to verify the query works as expected.
         artifact = ArtifactType.ExtendedArtifactType("BpmnDocument", false).newArtifactInstance();
-        verifyArtifact(binding.createArtifact(artifact));
+        verifyArtifact(binding.create(artifact));
         artifact.setName("LoanApproval");
-        verifyArtifact(binding.createArtifact(artifact));
+        verifyArtifact(binding.create(artifact));
         
         // Create with *and* without the property to verify the query works as expected.
         WsdlDocument wsdlArtifact = WsdlDocument();

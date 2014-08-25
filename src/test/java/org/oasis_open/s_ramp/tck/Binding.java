@@ -29,11 +29,15 @@ public abstract class Binding {
     
     public abstract List<BaseArtifactType> query(String query) throws Exception;
     
+    public abstract BaseArtifactType create(BaseArtifactType artifact) throws Exception;
+    
     public abstract BaseArtifactType upload(ArtifactType artifactType, String filePath) throws Exception;
     
     public abstract BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception;
     
-    public abstract BaseArtifactType createArtifact(BaseArtifactType artifact) throws Exception;
+    public abstract void update(BaseArtifactType artifact) throws Exception;
+    
+    public abstract void uploadOntology(String filePath) throws Exception;
     
     public abstract void deleteAll() throws Exception;
     

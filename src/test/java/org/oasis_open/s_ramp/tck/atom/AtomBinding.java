@@ -80,6 +80,20 @@ public class AtomBinding extends Binding {
         }
         return artifacts;
     }
+    
+    @Override
+    public BaseArtifactType create(BaseArtifactType artifact) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        String atomUrl = getUrl(artifactType);
+        
+        Builder clientRequest = getClientRequest(atomUrl);
+        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+                MediaType.APPLICATION_ATOM_XML_ENTRY));
+        checkResponse(response);
+        Entry entry = response.readEntity(Entry.class);
+        verifyEntry(entry);
+        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+    }
 
     @Override
     public BaseArtifactType upload(ArtifactType artifactType, String filePath) throws Exception {
@@ -128,18 +142,22 @@ public class AtomBinding extends Binding {
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
     
-    @Override
-    public BaseArtifactType createArtifact(BaseArtifactType artifact) throws Exception {
+    public void update(BaseArtifactType artifact) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
-        String atomUrl = getUrl(artifactType);
+        String atomUrl = getUrl(artifactType) + "/" + artifact.getUuid();
         
         Builder clientRequest = getClientRequest(atomUrl);
-        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+        Response response = clientRequest.put(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         checkResponse(response);
-        Entry entry = response.readEntity(Entry.class);
-        verifyEntry(entry);
-        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+    }
+    
+    public void uploadOntology(String filePath) throws Exception {
+        // TODO: This may not be required by the spec.
+        InputStream is = this.getClass().getResourceAsStream(filePath);
+        Builder clientRequest = getClientRequest(BASE_URL + "/s-ramp/ontology");
+        Response response = clientRequest.post(Entity.entity(is, MediaType.APPLICATION_RDF_XML));
+        checkResponse(response);
     }
     
     @Override
@@ -156,6 +174,12 @@ public class AtomBinding extends Binding {
                     }
                 }
             }
+        }
+        
+        // TODO: This may not be required by the spec.
+        feed = getFeed("/s-ramp/ontology");
+        for (Entry entry : feed.getEntries()) {
+            getClientRequest(BASE_URL + "/s-ramp/ontology/" + entry.getId()).delete();
         }
     }
     
@@ -201,7 +225,7 @@ public class AtomBinding extends Binding {
     }
     
     private void checkResponse(Response response) {
-        if (response.getStatus() != 200) {
+        if (response.getStatus() < 200 || response.getStatus() > 206) {
             fail("Server responded with status " + response.getStatus() + ".  Check the logs for issues.");
         }
     }
