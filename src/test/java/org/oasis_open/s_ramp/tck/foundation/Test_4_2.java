@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.Test;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocumentTarget;
 import org.oasis_open.s_ramp.tck.ArtifactType;
@@ -52,15 +53,15 @@ public class Test_4_2 extends CoreModelTest {
         artifact.getProperty().add(property);
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
-        // TODO FAILURE: SRAMP-167
         // Create with *and* without the property to verify the query works as expected.
-//        artifact = ServiceInstance();
-//        verifyArtifact(binding.createArtifact(artifact));
-//        artifact = ServiceInstance();
-//        property = new Property();
-//        property.setPropertyName("someProperty");
-//        property.setPropertyValue("high");
-//        verifyArtifact(binding.createArtifact(artifact));
+        artifact = new ServiceInstance();
+        verifyArtifact(binding.create(artifact));
+        artifact = new ServiceInstance();
+        property = new Property();
+        property.setPropertyName("someProperty");
+        property.setPropertyValue("high");
+        artifact.getProperty().add(property);
+        verifyArtifact(binding.create(artifact));
 
         // Create with *and* without the name to verify the query works as expected.
         artifact = ArtifactType.ExtendedArtifactType("BpmnDocument", false).newArtifactInstance();
@@ -87,12 +88,11 @@ public class Test_4_2 extends CoreModelTest {
         assertEquals(1, artifacts.size());
         assertEquals("bob", artifacts.get(0).getName());
         verifyArtifacts(artifacts);
-        // TODO FAILURE: SRAMP-167
-//        artifacts = binding.query("/s-ramp/serviceImplementation/ServiceInstance[@someProperty = 'high']");
-//        assertEquals(1, artifacts.size());
-//        assertEquals(1, artifacts.get(0).getProperty().size());
-//        assertEquals("someProperty", artifacts.get(0).getProperty().get(0).getPropertyName());
-//        verifyArtifacts(artifacts);
+        artifacts = binding.query("/s-ramp/serviceImplementation/ServiceInstance[@someProperty = 'high']");
+        assertEquals(1, artifacts.size());
+        assertEquals(1, artifacts.get(0).getProperty().size());
+        assertEquals("someProperty", artifacts.get(0).getProperty().get(0).getPropertyName());
+        verifyArtifacts(artifacts);
         
         // Example 4:  Query Expression Using Relationships
         // TODO FAILURE: SRAMP-547
