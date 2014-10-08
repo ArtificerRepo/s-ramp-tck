@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.oasis_open.s_ramp.tck.foundation;
-
-import java.util.List;
+package org.oasis_open.s_ramp.tck;
 
 import org.junit.After;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Document;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
@@ -28,22 +23,13 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PolicyDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XmlDocument;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
-import org.oasis_open.s_ramp.tck.ArtifactType;
-import org.oasis_open.s_ramp.tck.Binding;
-import org.oasis_open.s_ramp.tck.BindingFactory;
 
 /**
  * @author Brett Meyer
  */
-@RunWith(Parameterized.class)
 public abstract class AbstractTest {
     
     protected final Binding binding;
-    
-    @Parameters
-    public static List<Binding[]> bindings() {
-        return BindingFactory.getBindings();
-    }
     
     public AbstractTest(Binding binding) {
         this.binding = binding;

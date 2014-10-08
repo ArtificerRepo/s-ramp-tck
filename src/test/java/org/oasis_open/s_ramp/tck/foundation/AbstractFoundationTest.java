@@ -25,18 +25,29 @@ import java.util.List;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.DocumentArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
+import org.oasis_open.s_ramp.tck.AbstractTest;
 import org.oasis_open.s_ramp.tck.Binding;
+import org.oasis_open.s_ramp.tck.BindingFactory;
 
 /**
  * @author Brett Meyer
  */
-public abstract class CoreModelTest extends AbstractTest {
+@RunWith(Parameterized.class)
+public abstract class AbstractFoundationTest extends AbstractTest {
+    
+    @Parameters
+    public static List<Binding[]> bindings() {
+        return BindingFactory.getBindings();
+    }
 
-    public CoreModelTest(Binding binding) {
+    public AbstractFoundationTest(Binding binding) {
         super(binding);
     }
     

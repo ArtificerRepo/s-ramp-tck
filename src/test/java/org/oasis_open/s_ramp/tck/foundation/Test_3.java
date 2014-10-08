@@ -27,7 +27,7 @@ import org.oasis_open.s_ramp.tck.Binding;
 /**
  * @author Brett Meyer
  */
-public class Test_3 extends CoreModelTest {
+public class Test_3 extends AbstractFoundationTest {
 
     public Test_3(Binding binding) {
         super(binding);
