@@ -41,6 +41,7 @@ import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartConstants;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartRelatedOutput;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQuery;
 import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
 import org.oasis_open.s_ramp.tck.MediaType;
@@ -50,8 +51,8 @@ import org.oasis_open.s_ramp.tck.MediaType;
  */
 public class AtomBinding extends Binding {
     
-//    private static final String BASE_URL = System.getProperty("password");
-    private static final String BASE_URL = "http://localhost:8080/s-ramp-server";
+//    public static final String BASE_URL = System.getProperty("password");
+    public static final String BASE_URL = "http://localhost:8080/s-ramp-server";
 
     private static final QName DERIVED_QNAME = new QName(
             "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0", "derived", "s-ramp");
@@ -85,14 +86,25 @@ public class AtomBinding extends Binding {
     public BaseArtifactType create(BaseArtifactType artifact) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType);
-        
+        Entry entry = create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact));
+        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+    }
+    
+    @Override
+    public StoredQuery create(StoredQuery storedQuery) throws Exception {
+        String atomUrl = BASE_URL + "/s-ramp/query";
+        Entry entry = create(atomUrl, SrampAtomUtils.wrapStoredQuery(storedQuery));
+        return SrampAtomUtils.unwrapStoredQuery(entry);
+    }
+    
+    private Entry create(String atomUrl, Entry entry) {
         Builder clientRequest = getClientRequest(atomUrl);
-        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+        Response response = clientRequest.post(Entity.entity(entry,
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         checkResponse(response);
-        Entry entry = response.readEntity(Entry.class);
+        entry = response.readEntity(Entry.class);
         verifyEntry(entry);
-        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+        return entry;
     }
 
     @Override
@@ -176,6 +188,13 @@ public class AtomBinding extends Binding {
             }
         }
         
+        feed = getFeed("/s-ramp/query");
+        for (Entry entry : feed.getEntries()) {
+            String queryName = entry.getId().toString();
+            queryName = queryName.replace("urn:uuid:", "");
+            getClientRequest(BASE_URL + "/s-ramp/query/" + queryName).delete();
+        }
+        
         // TODO: This may not be required by the spec.
         feed = getFeed("/s-ramp/ontology");
         for (Entry entry : feed.getEntries()) {
@@ -210,7 +229,7 @@ public class AtomBinding extends Binding {
         return entry;
     }
     
-    private Builder getClientRequest(String endpoint) {
+    public Builder getClientRequest(String endpoint) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         client.register(new BasicAuthFilter());
         return client.target(endpoint).request();

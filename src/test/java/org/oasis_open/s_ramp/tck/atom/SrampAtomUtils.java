@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.jboss.resteasy.plugins.providers.atom.Category;
+import org.jboss.resteasy.plugins.providers.atom.Content;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.jboss.resteasy.plugins.providers.atom.Person;
@@ -35,7 +36,10 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactEnum;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQuery;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQueryData;
 import org.oasis_open.s_ramp.tck.ArtifactType;
+import org.oasis_open.s_ramp.tck.SrampAtomConstants;
 import org.oasis_open.s_ramp.tck.SrampConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -64,9 +68,8 @@ public final class SrampAtomUtils {
 	 * @param artifactType the s-ramp artifact type
 	 * @param artifact the s-ramp wrapper {@link Artifact}
 	 * @return a {@link BaseArtifactType}
-	 * @throws Exception 
 	 */
-	public static BaseArtifactType unwrapSrampArtifact(ArtifactType artifactType, Artifact artifact) throws Exception {
+	public static BaseArtifactType unwrapSrampArtifact(ArtifactType artifactType, Artifact artifact) {
 		return artifactType.unwrap(artifact);
 	}
 
@@ -76,9 +79,8 @@ public final class SrampAtomUtils {
 	 * {@link BaseArtifactType} from that.
 	 * @param entry an Atom {@link Entry}
 	 * @return a {@link BaseArtifactType}
-	 * @throws Exception 
 	 */
-	public static BaseArtifactType unwrapSrampArtifact(Entry entry) throws Exception {
+	public static BaseArtifactType unwrapSrampArtifact(Entry entry) {
 		ArtifactType artifactType = getArtifactType(entry);
 		return unwrapSrampArtifact(artifactType, entry);
 	}
@@ -90,9 +92,8 @@ public final class SrampAtomUtils {
 	 * @param artifactType the s-ramp artifact type
 	 * @param entry an Atom {@link Entry}
 	 * @return a {@link BaseArtifactType}
-	 * @throws Exception 
 	 */
-	public static BaseArtifactType unwrapSrampArtifact(ArtifactType artifactType, Entry entry) throws Exception {
+	public static BaseArtifactType unwrapSrampArtifact(ArtifactType artifactType, Entry entry) {
 		try {
 			Artifact artifact = getArtifactWrapper(entry);
 			if (artifact != null) {
@@ -154,6 +155,32 @@ public final class SrampAtomUtils {
 
 		return entry;
 	}
+    
+    public static Entry wrapStoredQuery(StoredQuery storedQuery) throws Exception {
+        Entry entry = new Entry();
+        entry.setId(new URI("urn:uuid:" + storedQuery.getQueryName())); //$NON-NLS-1$
+        entry.setTitle("Stored Query: " + storedQuery.getQueryName()); //$NON-NLS-1$
+        
+        // TODO: This is really stupid.  Going to push back on this w/ the TC.  The Atom binding spec should simply
+        // reuse the core model's StoredQuery.
+        StoredQueryData data = new StoredQueryData();
+        data.setQueryName(storedQuery.getQueryName());
+        data.setQueryString(storedQuery.getQueryExpression());
+        data.getPropertyName().addAll(storedQuery.getPropertyName());
+        entry.setAnyOtherJAXBObject(data);
+        
+        Content content = new Content();
+        content.setText("Stored Query Entry"); //$NON-NLS-1$
+        entry.setContent(content);
+        
+        Category category = new Category();
+        category.setTerm("query"); //$NON-NLS-1$
+        category.setLabel("Stored Query Entry"); //$NON-NLS-1$
+        category.setScheme(SrampAtomConstants.X_S_RAMP_TYPE_URN);
+        entry.getCategories().add(category);
+        
+        return entry;
+    }
 
 	/**
      * Figures out the S-RAMP artifact type for the given {@link Entry}.
@@ -199,7 +226,7 @@ public final class SrampAtomUtils {
         // Try the Category
 		List<Category> categories = entry.getCategories();
 		for (Category cat : categories) {
-			if ("x-s-ramp:2010:type".equals(cat.getScheme().toString())) { //$NON-NLS-1$
+			if (SrampAtomConstants.X_S_RAMP_TYPE.equals(cat.getScheme().toString())) {
 				String atype = cat.getTerm();
 				ArtifactType artifactType = ArtifactType.valueOf(atype);
 		        if (artifactType.isExtendedType()) {
@@ -342,28 +369,22 @@ public final class SrampAtomUtils {
         return qname.equals(SrampConstants.S_RAMP_WRAPPER_ELEM);
     }
 
-//    /**
-//     * Unwraps the Ontology from the Atom Entry.
-//     * @param entry
-//     */
-//    public static RDF unwrapRDF(Entry entry) {
-//        try {
-//            return unwrap(entry, RDF.class);
-//        } catch (JAXBException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    /**
-//     * Unwraps the audit entry from the Atom Entry.
-//     * @param entry
-//     */
-//    public static AuditEntry unwrapAuditEntry(Entry entry) {
-//        try {
-//            return unwrap(entry, AuditEntry.class);
-//        } catch (JAXBException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    /**
+     * Unwraps the stored query entry from the Atom Entry.
+     * @param entry
+     */
+    public static StoredQuery unwrapStoredQuery(Entry entry) {
+        try {
+            // TODO: Again, this is stupid.  StoredQuery and StoredQueryData should be combined.
+            StoredQueryData data = unwrap(entry, StoredQueryData.class);
+            StoredQuery storedQuery = new StoredQuery();
+            storedQuery.setQueryExpression(data.getQueryString());
+            storedQuery.setQueryName(data.getQueryName());
+            storedQuery.getPropertyName().addAll(data.getPropertyName());
+            return storedQuery;
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

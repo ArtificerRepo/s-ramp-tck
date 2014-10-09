@@ -18,6 +18,7 @@ package org.oasis_open.s_ramp.tck;
 import java.util.List;
 
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQuery;
 
 /**
  * @author Brett Meyer
@@ -30,6 +31,8 @@ public abstract class Binding {
     public abstract List<BaseArtifactType> query(String query) throws Exception;
     
     public abstract BaseArtifactType create(BaseArtifactType artifact) throws Exception;
+    
+    public abstract StoredQuery create(StoredQuery storedQuery) throws Exception;
     
     public abstract BaseArtifactType upload(ArtifactType artifactType, String filePath) throws Exception;
     
