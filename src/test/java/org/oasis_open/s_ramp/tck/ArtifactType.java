@@ -115,7 +115,7 @@ public class ArtifactType {
     private ArtifactType(ArtifactTypeEnum artifactType, String mimeType) {
         setArtifactType(artifactType);
         // Might need something more interesting than this in the future.
-        if (mimeType == null && artifactType.isDocument()) {
+        if (mimeType == null) {
             if (artifactType == ArtifactTypeEnum.Document || artifactType == ArtifactTypeEnum.ExtendedDocument) {
                 mimeType = "application/octet-stream"; //$NON-NLS-1$
             } else {
