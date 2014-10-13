@@ -16,6 +16,8 @@
 package org.oasis_open.s_ramp.tck.atom;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -35,6 +37,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.plugins.providers.atom.Category;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Feed;
 import org.jboss.resteasy.plugins.providers.atom.Link;
@@ -45,6 +48,7 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQuery;
 import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
 import org.oasis_open.s_ramp.tck.MediaType;
+import org.oasis_open.s_ramp.tck.SrampAtomConstants;
 
 /**
  * @author Brett Meyer
@@ -129,6 +133,12 @@ public class AtomBinding extends Binding {
     @Override
     public BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        Entry entry = uploadReturnEntry(artifact, filePath);
+        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+    }
+    
+    public Entry uploadReturnEntry(BaseArtifactType artifact, String filePath) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType);
         Builder clientRequest = getClientRequest(atomUrl);
 
@@ -151,7 +161,7 @@ public class AtomBinding extends Binding {
         checkResponse(response);
         Entry entry = response.readEntity(Entry.class);
         verifyEntry(entry);
-        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+        return entry;
     }
     
     public void update(BaseArtifactType artifact) throws Exception {
@@ -190,15 +200,15 @@ public class AtomBinding extends Binding {
         
         feed = getFeed("/s-ramp/query");
         for (Entry entry : feed.getEntries()) {
-            String queryName = entry.getId().toString();
-            queryName = queryName.replace("urn:uuid:", "");
+            String queryName = entry.getId().toString().replace("urn:uuid:", "");
             getClientRequest(BASE_URL + "/s-ramp/query/" + queryName).delete();
         }
         
         // TODO: This may not be required by the spec.
         feed = getFeed("/s-ramp/ontology");
         for (Entry entry : feed.getEntries()) {
-            getClientRequest(BASE_URL + "/s-ramp/ontology/" + entry.getId()).delete();
+            String uuid = entry.getId().toString().replace("urn:uuid:", "");
+            getClientRequest(BASE_URL + "/s-ramp/ontology/" + uuid).delete();
         }
     }
     
@@ -266,6 +276,35 @@ public class AtomBinding extends Binding {
             // Foundation 1.9
             assertEquals(NAMESPACE, qname.getNamespaceURI());
         }
+        
+        // Atom 2.2
+        assertTrue(entry.getId().toString().contains("urn:uuid:"));
+        
+        // Atom 2.3.1
+        assertTrue(entry.getCategories().size() > 0);
+        Category category = findCategory(SrampAtomConstants.X_S_RAMP_TYPE, entry);
+        assertNotNull(category);
+        if (category.getTerm().equals("query") || category.getTerm().equals("classification")) {
+            // Do nothing: stored query or classification.
+        } else {
+            // Else, assume it's an artifact.
+            ArtifactType artifactType = SrampAtomUtils.getArtifactTypeFromEntry(entry);
+            // TODO: Not sure if this is correct.  In Overlord, the term is the name of the extended type,
+            // not "ExtendedArtifactType"
+            if (! artifactType.isExtendedType()) {
+                assertEquals(artifactType.getArtifactType().getType(), category.getTerm());
+            }
+        }
+        // TODO: Test the "kind" category after SRAMP-596.  urn:x-sramp:2013:kind must be "derived", "modeled", or "generic"
+    }
+    
+    private Category findCategory(String scheme, Entry entry) {
+        for (Category category : entry.getCategories()) {
+            if (category.getScheme().toString().equals(scheme)) {
+                return category;
+            }
+        }
+        return null;
     }
     
     public static class BasicAuthFilter implements ClientRequestFilter {
