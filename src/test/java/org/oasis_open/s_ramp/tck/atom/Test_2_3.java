@@ -20,17 +20,23 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.core.Response;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.jboss.resteasy.plugins.providers.atom.Category;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.junit.Test;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Target;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XmlDocument;
+import org.oasis_open.s_ramp.tck.ArtifactType;
+import org.oasis_open.s_ramp.tck.MediaType;
 
 /**
  * @author Brett Meyer
@@ -38,7 +44,7 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XmlDocument;
 public class Test_2_3 extends AbstractAtomTest {
 
     @Test
-    public void testAtomElementMappings() throws Exception {
+    public void test_2_3_1() throws Exception {
         XmlDocument artifact = XmlDocument();
         artifact.setCreatedBy("admin");
         artifact.setLastModifiedBy("admin");
@@ -64,7 +70,7 @@ public class Test_2_3 extends AbstractAtomTest {
     }
 
     @Test
-    public void testLinkValues() throws Exception {
+    public void test_2_3_2() throws Exception {
         XmlDocument artifact1 = XmlDocument();
         artifact1.setName("PO 1");
         Entry entry1 = binding.uploadReturnEntry(artifact1, "/PO.xml");
@@ -91,5 +97,41 @@ public class Test_2_3 extends AbstractAtomTest {
         link = entry2.getLinkByRel("edit");
         assertNotNull(link);
         assertTrue(link.getHref().toString().contains(artifact2.getUuid()));
+    }
+    
+    @Test
+    public void test_2_3_5_wrongCollection() throws Exception {
+        // Purposefully send an artifact to the wrong collection endpoint.
+        String atomUrl = AtomBinding.BASE_URL + "/s-ramp/xsd/XsdDocument";
+        ExtendedArtifactType artifact = ExtendedArtifactType("FooType");
+        artifact.setName("FooName");
+        // TODO: FAILURE SRAMP-598
+//        Builder clientRequest = binding.getClientRequest(atomUrl);
+//        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+//                MediaType.APPLICATION_ATOM_XML_ENTRY));
+//        assertEquals(403, response.getStatus());
+    }
+    
+    @Test
+    public void test_2_3_5_1() throws Exception {
+        ExtendedArtifactType artifact = ExtendedArtifactType("FooType");
+        artifact.setName("FooName");
+        artifact.setUuid(UUID.randomUUID().toString());
+        
+        // A non-existent artifact cannot be updated.
+        // TODO: FAILURE SRAMP-598
+//        binding.update(artifact, 404);
+        
+        // An existing UUID cannot be duplicated.
+        // TODO: FAILURE SRAMP-598
+//        binding.create(artifact);
+//        binding.create(artifact, 409);
+    }
+    
+    @Test
+    public void test_2_3_5_3() throws Exception {
+        // A non-existent artifact cannot be retrieved.
+        // TODO: FAILURE SRAMP-598
+//        binding.get("NotReal", ArtifactType.Document(), 404);
     }
 }

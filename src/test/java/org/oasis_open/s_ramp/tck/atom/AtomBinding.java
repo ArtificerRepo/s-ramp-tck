@@ -51,6 +51,9 @@ import org.oasis_open.s_ramp.tck.MediaType;
 import org.oasis_open.s_ramp.tck.SrampAtomConstants;
 
 /**
+ * Provides an Atom binding for the Foundational spec tests.  In addition, this provides coverage of much of the
+ * Atom binding spec, where possible.  Additional coverage is provided by the tests in the *.atom package.
+ * 
  * @author Brett Meyer
  */
 public class AtomBinding extends Binding {
@@ -65,10 +68,23 @@ public class AtomBinding extends Binding {
     
     @Override
     public BaseArtifactType get(String uuid, ArtifactType type) throws Exception {
+        return get(uuid, type, 200);
+    }
+    
+    public BaseArtifactType get(String uuid, ArtifactType type, int expectedResponse) throws Exception {
         String atomUrl = getUrl(type) + "/" + uuid;
-        Entry entry = getArtifact(atomUrl);
+        Entry entry = getArtifact(atomUrl, expectedResponse);
         verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(entry);
+    }
+    
+    private void verifyMedia(String uuid, ArtifactType type) {
+        String atomUrl = getUrl(type) + "/" + uuid + "/media";
+        Builder clientRequest = getClientRequest(atomUrl);
+        Response response = clientRequest.get();
+        verifyResponse(response, 200);
+        ArrayList<?> responseContentTypeValues = (ArrayList<?>) response.getMetadata().get("Content-Type");
+        assertEquals(type.getMimeType(), responseContentTypeValues.get(0));
     }
 
     @Override
@@ -79,7 +95,7 @@ public class AtomBinding extends Binding {
             for (Link link : entry.getLinks()) {
                 // TODO: Safe assumption for all impls?
                 if ("self".equals(link.getRel())) {
-                    artifacts.add(SrampAtomUtils.unwrapSrampArtifact(getArtifact(link.getHref().toString())));
+                    artifacts.add(SrampAtomUtils.unwrapSrampArtifact(getArtifact(link.getHref().toString(), 200)));
                 }
             }
         }
@@ -101,14 +117,25 @@ public class AtomBinding extends Binding {
         return SrampAtomUtils.unwrapStoredQuery(entry);
     }
     
-    private Entry create(String atomUrl, Entry entry) {
-        Builder clientRequest = getClientRequest(atomUrl);
-        Response response = clientRequest.post(Entity.entity(entry,
-                MediaType.APPLICATION_ATOM_XML_ENTRY));
-        checkResponse(response);
+    public Entry create(String atomUrl, Entry entry) {
+        Response response = create(atomUrl, entry, 200);
         entry = response.readEntity(Entry.class);
         verifyEntry(entry);
         return entry;
+    }
+    
+    public Response create(String atomUrl, Entry entry, int expectedResponse) {
+        Builder clientRequest = getClientRequest(atomUrl);
+        Response response = clientRequest.post(Entity.entity(entry,
+                MediaType.APPLICATION_ATOM_XML_ENTRY));
+        verifyResponse(response, expectedResponse);
+        return response;
+    }
+    
+    public Response create(BaseArtifactType artifact, int expectedResponse) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        String atomUrl = getUrl(artifactType);
+        return create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact), expectedResponse);
     }
 
     @Override
@@ -124,7 +151,7 @@ public class AtomBinding extends Binding {
         clientRequest.header("Slug", fileName);
 
         Response response = clientRequest.post(Entity.entity(text, artifactType.getMimeType()));
-        checkResponse(response);
+        verifyResponse(response, 200);
         Entry entry = response.readEntity(Entry.class);
         verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
@@ -158,28 +185,34 @@ public class AtomBinding extends Binding {
 
         //3. Send the request
         Response response = clientRequest.post(Entity.entity(output, MultipartConstants.MULTIPART_RELATED));
-        checkResponse(response);
+        verifyResponse(response, 200);
         Entry entry = response.readEntity(Entry.class);
         verifyEntry(entry);
         return entry;
     }
     
+    @Override
     public void update(BaseArtifactType artifact) throws Exception {
+        update(artifact, 200);
+    }
+    
+    public void update(BaseArtifactType artifact, int expectedResponse) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType) + "/" + artifact.getUuid();
         
         Builder clientRequest = getClientRequest(atomUrl);
         Response response = clientRequest.put(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
-        checkResponse(response);
+        verifyResponse(response, expectedResponse);
     }
     
+    @Override
     public void uploadOntology(String filePath) throws Exception {
         // TODO: This may not be required by the spec.
         InputStream is = this.getClass().getResourceAsStream(filePath);
         Builder clientRequest = getClientRequest(BASE_URL + "/s-ramp/ontology");
         Response response = clientRequest.post(Entity.entity(is, MediaType.APPLICATION_RDF_XML));
-        checkResponse(response);
+        verifyResponse(response, 200);
     }
     
     @Override
@@ -232,9 +265,11 @@ public class AtomBinding extends Binding {
         return feed;
     }
     
-    private Entry getArtifact(String url) {
+    private Entry getArtifact(String url, int expectedResponse) {
         Builder clientRequest = getClientRequest(url);
-        Entry entry = clientRequest.get(Entry.class);
+        Response response = clientRequest.get();
+        verifyResponse(response, expectedResponse);
+        Entry entry = response.readEntity(Entry.class);
         verifyEntry(entry);
         return entry;
     }
@@ -253,10 +288,8 @@ public class AtomBinding extends Binding {
         }
     }
     
-    private void checkResponse(Response response) {
-        if (response.getStatus() < 200 || response.getStatus() > 206) {
-            fail("Server responded with status " + response.getStatus() + ".  Check the logs for issues.");
-        }
+    private void verifyResponse(Response response, int expectedResponse) {
+        assertEquals("Server responded with an unexpected HTTP status.", expectedResponse, response.getStatus());
     }
     
     private void verifyFeed(Feed feed) {
@@ -279,6 +312,7 @@ public class AtomBinding extends Binding {
         
         // Atom 2.2
         assertTrue(entry.getId().toString().contains("urn:uuid:"));
+        String uuid = entry.getId().toString().replace("urn:uuid:", "");
         
         // Atom 2.3.1
         assertTrue(entry.getCategories().size() > 0);
@@ -289,6 +323,10 @@ public class AtomBinding extends Binding {
         } else {
             // Else, assume it's an artifact.
             ArtifactType artifactType = SrampAtomUtils.getArtifactTypeFromEntry(entry);
+            if (artifactType.isDocument()) {
+                // Atom 2.3.5.3 -- verify /media returns the content.
+                verifyMedia(uuid, artifactType);
+            }
             // TODO: Not sure if this is correct.  In Overlord, the term is the name of the extended type,
             // not "ExtendedArtifactType"
             if (! artifactType.isExtendedType()) {
