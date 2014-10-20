@@ -18,7 +18,6 @@ package org.oasis_open.s_ramp.tck.atom;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,8 +73,11 @@ public class AtomBinding extends Binding {
     public BaseArtifactType get(String uuid, ArtifactType type, int expectedResponse) throws Exception {
         String atomUrl = getUrl(type) + "/" + uuid;
         Entry entry = getArtifact(atomUrl, expectedResponse);
-        verifyEntry(entry);
-        return SrampAtomUtils.unwrapSrampArtifact(entry);
+        if (entry != null) {
+            return SrampAtomUtils.unwrapSrampArtifact(entry);
+        } else {
+            return null;
+        }
     }
     
     private void verifyMedia(String uuid, ArtifactType type) {
@@ -193,7 +195,7 @@ public class AtomBinding extends Binding {
     
     @Override
     public void update(BaseArtifactType artifact) throws Exception {
-        update(artifact, 200);
+        update(artifact, 204);
     }
     
     public void update(BaseArtifactType artifact, int expectedResponse) throws Exception {
@@ -268,10 +270,14 @@ public class AtomBinding extends Binding {
     private Entry getArtifact(String url, int expectedResponse) {
         Builder clientRequest = getClientRequest(url);
         Response response = clientRequest.get();
-        verifyResponse(response, expectedResponse);
-        Entry entry = response.readEntity(Entry.class);
-        verifyEntry(entry);
-        return entry;
+        boolean continueProcessing = verifyResponse(response, expectedResponse);
+        if (continueProcessing) {
+            Entry entry = response.readEntity(Entry.class);
+            verifyEntry(entry);
+            return entry;
+        } else {
+            return null;
+        }
     }
     
     public Builder getClientRequest(String endpoint) {
@@ -288,8 +294,10 @@ public class AtomBinding extends Binding {
         }
     }
     
-    private void verifyResponse(Response response, int expectedResponse) {
+    private boolean verifyResponse(Response response, int expectedResponse) {
         assertEquals("Server responded with an unexpected HTTP status.", expectedResponse, response.getStatus());
+        // True if we should continue processing, such as expecting an Entry to be returned.
+        return response.getStatus() >= 200 && response.getStatus() <= 206;
     }
     
     private void verifyFeed(Feed feed) {

@@ -31,6 +31,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.junit.Test;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Target;
@@ -105,11 +106,10 @@ public class Test_2_3 extends AbstractAtomTest {
         String atomUrl = AtomBinding.BASE_URL + "/s-ramp/xsd/XsdDocument";
         ExtendedArtifactType artifact = ExtendedArtifactType("FooType");
         artifact.setName("FooName");
-        // TODO: FAILURE SRAMP-598
-//        Builder clientRequest = binding.getClientRequest(atomUrl);
-//        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
-//                MediaType.APPLICATION_ATOM_XML_ENTRY));
-//        assertEquals(403, response.getStatus());
+        Builder clientRequest = binding.getClientRequest(atomUrl);
+        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
+                MediaType.APPLICATION_ATOM_XML_ENTRY));
+        assertEquals(403, response.getStatus());
     }
     
     @Test
@@ -119,19 +119,23 @@ public class Test_2_3 extends AbstractAtomTest {
         artifact.setUuid(UUID.randomUUID().toString());
         
         // A non-existent artifact cannot be updated.
-        // TODO: FAILURE SRAMP-598
-//        binding.update(artifact, 404);
+        binding.update(artifact, 404);
         
         // An existing UUID cannot be duplicated.
-        // TODO: FAILURE SRAMP-598
-//        binding.create(artifact);
-//        binding.create(artifact, 409);
+        binding.create(artifact);
+        binding.create(artifact, 409);
     }
     
     @Test
     public void test_2_3_5_3() throws Exception {
         // A non-existent artifact cannot be retrieved.
-        // TODO: FAILURE SRAMP-598
-//        binding.get("NotReal", ArtifactType.Document(), 404);
+        binding.get(UUID.randomUUID().toString(), ArtifactType.ExtendedArtifactType("FooType", false), 404);
+        
+        BaseArtifactType artifact = ExtendedArtifactType("FooType");
+        artifact.setName("FooName");
+        artifact = binding.create(artifact);
+        
+        // Nor can it be retrieved from the incorrect model.
+        binding.get(artifact.getUuid(), ArtifactType.PolicyDocument(), 404);
     }
 }
