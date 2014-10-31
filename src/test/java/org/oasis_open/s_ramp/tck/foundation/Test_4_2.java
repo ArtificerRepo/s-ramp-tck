@@ -24,7 +24,6 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocumentTarget;
 import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
 
@@ -41,17 +40,21 @@ public class Test_4_2 extends AbstractFoundationTest {
     public void test_examples() throws Exception {
         // Create with *and* without the name to verify the query works as expected.
         BaseArtifactType artifact = XsdDocument();
-        BaseArtifactType uploadedXsd = binding.upload(artifact, "/PO.xsd");
+        // TODO: Overlord S-RAMP requires that the slug name *or* the artifact name be set to the filename.  We use
+        // this to resolve derived relationships between artifacts and schemas.
+        artifact.setName("ws-humantask-types.xsd");
+        BaseArtifactType uploadedXsd = binding.upload(artifact, "/ws-humantask-types.xsd");
         verifyArtifact(uploadedXsd);
         artifact.setName("bob");
-        verifyArtifact(binding.upload(artifact, "/PO.xsd"));
+        verifyArtifact(binding.upload(artifact, "/ws-humantask-types.xsd"));
         
         artifact = XsdDocument();
+        artifact.setName("ws-humantask-types.xsd");
         Property property = new Property();
         property.setPropertyName("someProperty");
         property.setPropertyValue("high");
         artifact.getProperty().add(property);
-        verifyArtifact(binding.upload(artifact, "/PO.xsd"));
+        verifyArtifact(binding.upload(artifact, "/ws-humantask-types.xsd"));
         
         // Create with *and* without the property to verify the query works as expected.
         artifact = new ServiceInstance();
@@ -71,12 +74,9 @@ public class Test_4_2 extends AbstractFoundationTest {
         
         // Create with *and* without the property to verify the query works as expected.
         WsdlDocument wsdlArtifact = WsdlDocument();
-        verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl"));
-        XsdDocumentTarget xsdTarget = new XsdDocumentTarget();
-        xsdTarget.setHref(binding.getUrl(uploadedXsd));
-        xsdTarget.setValue("foo");
-        wsdlArtifact.getIncludedXsds().add(xsdTarget);
-        verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl"));
+        verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl")); // does not import an xsd
+        wsdlArtifact.getProperty().add(property);
+        verifyArtifact(binding.upload(wsdlArtifact, "/ws-humantask-api.wsdl")); // imports an xsd
         
         // Example 3:  Query Expressions Using Properties
         List<BaseArtifactType> artifacts = binding.query("/s-ramp/xsd/XsdDocument[@someProperty]");
@@ -95,18 +95,18 @@ public class Test_4_2 extends AbstractFoundationTest {
         verifyArtifacts(artifacts);
         
         // Example 4:  Query Expression Using Relationships
-        // TODO FAILURE: SRAMP-547
-//        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[includedXsds]");
-//        assertEquals(1, artifacts.size());
-//        wsdlArtifact = (WsdlDocument) artifacts.get(0);
-//        assertEquals(1, wsdlArtifact.getIncludedXsds().size());
+        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds]");
+        assertEquals(1, artifacts.size());
+        wsdlArtifact = (WsdlDocument) artifacts.get(0);
+        assertEquals(1, wsdlArtifact.getImportedXsds().size());
         
         // Example 5:  Query Expression Using Relationships and Properties
-        // TODO FAILURE: SRAMP-547
-//        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[includedXsds[@someProperty='true']]");
-//        assertEquals(1, artifacts.size());
-//        wsdlArtifact = (WsdlDocument) artifacts.get(0);
-//        assertEquals(1, wsdlArtifact.getIncludedXsds().size());
+        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='high']]");
+        assertEquals(1, artifacts.size());
+        wsdlArtifact = (WsdlDocument) artifacts.get(0);
+        assertEquals(1, wsdlArtifact.getImportedXsds().size());
+        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='doesntexist']]");
+        assertEquals(0, artifacts.size());
         
         // Example 6:  Extended Artifacts
         artifacts = binding.query("/s-ramp/ext/BpmnDocument[@name = 'LoanApproval']");
