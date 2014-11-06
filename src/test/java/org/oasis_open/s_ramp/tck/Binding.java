@@ -38,6 +38,8 @@ public abstract class Binding {
     
     public abstract BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception;
     
+    public abstract BaseArtifactType upload(BaseArtifactType artifact, String filePath, int expectedResponse) throws Exception;
+    
     public abstract void update(BaseArtifactType artifact) throws Exception;
     
     public abstract void uploadOntology(String filePath) throws Exception;

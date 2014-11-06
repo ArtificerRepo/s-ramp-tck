@@ -161,12 +161,25 @@ public class AtomBinding extends Binding {
     
     @Override
     public BaseArtifactType upload(BaseArtifactType artifact, String filePath) throws Exception {
+        return upload(artifact, filePath, 200);
+    }
+    
+    @Override
+    public BaseArtifactType upload(BaseArtifactType artifact, String filePath, int expectedResponse) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
-        Entry entry = uploadReturnEntry(artifact, filePath);
-        return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+        Entry entry = uploadReturnEntry(artifact, filePath, expectedResponse);
+        if (entry != null) {
+            return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
+        } else {
+            return null;
+        }
     }
     
     public Entry uploadReturnEntry(BaseArtifactType artifact, String filePath) throws Exception {
+        return uploadReturnEntry(artifact, filePath, 200);
+    }
+    
+    public Entry uploadReturnEntry(BaseArtifactType artifact, String filePath, int expectedResponse) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType);
         Builder clientRequest = getClientRequest(atomUrl);
@@ -187,10 +200,14 @@ public class AtomBinding extends Binding {
 
         //3. Send the request
         Response response = clientRequest.post(Entity.entity(output, MultipartConstants.MULTIPART_RELATED));
-        verifyResponse(response, 200);
-        Entry entry = response.readEntity(Entry.class);
-        verifyEntry(entry);
-        return entry;
+        boolean continueProcessing = verifyResponse(response, expectedResponse);
+        if (continueProcessing) {
+            Entry entry = response.readEntity(Entry.class);
+            verifyEntry(entry);
+            return entry;
+        } else {
+            return null;
+        }
     }
     
     @Override

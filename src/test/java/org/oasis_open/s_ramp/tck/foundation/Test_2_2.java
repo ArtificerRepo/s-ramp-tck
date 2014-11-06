@@ -32,21 +32,42 @@ public class Test_2_2 extends AbstractFoundationTest {
     
     @Test
     public void test_2_2_1_2() throws Exception {
+        BaseArtifactType targetArtifact = XsdDocument();
+        targetArtifact = binding.upload(targetArtifact, "/PO.xsd");
+        verifyArtifact(targetArtifact);
+        
         BaseArtifactType artifact = XsdDocument();
         Property property = new Property();
         property.setPropertyName("someProperty");
         property.setPropertyValue("high");
         artifact.getProperty().add(property);
-        // Try adding a duplicate, but let verifyArtifact ensure that only one instance of the propertyName exists.
-        artifact.getProperty().add(property);
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
         
-        // TODO FAILURE: SRAMP-549
-//        Relationship relationship = new Relationship();
-//        // Property names cannot duplicate relationship names.
-//        relationship.setRelationshipType("someProperty");
-//        artifact.getRelationship().add(relationship);
-//        verifyArtifact(binding.upload(artifact, "/PO.xsd"));
+        Relationship relationship = new Relationship();
+        // Property names cannot duplicate relationship names.
+        relationship.setRelationshipType("someProperty");
+        artifact.getRelationship().add(relationship);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getRelationship().clear();
+        
+        // Cannot duplicate property names.
+        artifact.getProperty().add(property);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getProperty().clear();
+        
+        // Cannot duplicate built-in property names.
+        property.setPropertyName("description");
+        artifact.getProperty().add(property);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getProperty().clear();
+        
+        // Cannot duplicate built-in relationship names.
+        property.setPropertyName("importedXsds");
+        artifact.getProperty().add(property);
+        binding.upload(artifact, "/PO.xsd", 409);
     }
     
     @Test
@@ -55,9 +76,34 @@ public class Test_2_2 extends AbstractFoundationTest {
         Relationship relationship = new Relationship();
         relationship.setRelationshipType("someRelationship");
         artifact.getRelationship().add(relationship);
-        // Try adding a duplicate, but let verifyArtifact ensure that only one instance of the relationship type exists.
-        artifact.getRelationship().add(relationship);
         verifyArtifact(binding.upload(artifact, "/PO.xsd"));
+        
+        Property property = new Property();
+        // Property names cannot duplicate relationship names.
+        property.setPropertyName("someRelationship");
+        property.setPropertyValue("foo");
+        artifact.getProperty().add(property);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getProperty().clear();
+        
+        // Cannot duplicate relationship names.
+        artifact.getRelationship().add(relationship);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getRelationship().clear();
+        
+        // Cannot duplicate built-in property names.
+        relationship.setRelationshipType("description");
+        artifact.getRelationship().add(relationship);
+        binding.upload(artifact, "/PO.xsd", 409);
+        
+        artifact.getRelationship().clear();
+        
+        // Cannot duplicate built-in relationship names.
+        relationship.setRelationshipType("importedXsds");
+        artifact.getRelationship().add(relationship);
+        binding.upload(artifact, "/PO.xsd", 409);
     }
     
     // TODO: 2.2.2 Documents which have a Derived Model associated with them cannot be updated in the repository.  They must be removed and republished.
