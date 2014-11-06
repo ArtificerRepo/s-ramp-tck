@@ -11,6 +11,9 @@
   <xsd:element name="purchaseOrder" type="PurchaseOrderType" />
  
   <xsd:element name="comment" type="xsd:string"/>
+  
+  <!-- This obviously doesn't need to be global, but doing so to let the AttributeDeclaration deriver kick in. -->
+  <xsd:attribute name="orderDate" type="xsd:date"/>
  
   <xsd:complexType name="PurchaseOrderType">
     <xsd:sequence>
@@ -19,7 +22,7 @@
       <xsd:element ref="comment" minOccurs="0"/>
       <xsd:element name="items"  type="Items"/>
     </xsd:sequence>
-    <xsd:attribute name="orderDate" type="xsd:date"/>
+    <xsd:attribute ref="orderDate"/>
   </xsd:complexType>
  
   <xsd:complexType name="USAddress">

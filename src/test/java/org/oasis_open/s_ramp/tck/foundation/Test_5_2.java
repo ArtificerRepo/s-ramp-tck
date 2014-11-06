@@ -16,6 +16,7 @@
 package org.oasis_open.s_ramp.tck.foundation;
 
 import org.junit.Test;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.AttributeDeclaration;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperation;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperationFault;
@@ -88,8 +89,7 @@ public class Test_5_2 extends AbstractFoundationTest {
         verifyArtifact(artifact, XsdDocument.class);
 
         verifyArtifacts(binding.query("/s-ramp/xsd/ElementDeclaration"), ElementDeclaration.class);
-        // TODO FAILURE: SRAMP-550
-//        verifyArtifacts(binding.query("/s-ramp/xsd/AttributeDeclaration"), AttributeDeclaration.class);
+        verifyArtifacts(binding.query("/s-ramp/xsd/AttributeDeclaration"), AttributeDeclaration.class);
         verifyArtifacts(binding.query("/s-ramp/xsd/ComplexTypeDeclaration"), ComplexTypeDeclaration.class);
         verifyArtifacts(binding.query("/s-ramp/xsd/SimpleTypeDeclaration"), SimpleTypeDeclaration.class);
     }
