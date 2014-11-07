@@ -65,9 +65,13 @@ public class Test_2_3 extends AbstractAtomTest {
         assertEquals(artifact.getLastModifiedTimestamp(), gc);
         assertEquals(artifact.getName(), entry.getTitle());
         assertEquals(artifact.getDescription(), entry.getSummary());
-        assertEquals(artifact.getContentType(), entry.getLinks().get(0).getType().toString());
-        // TODO: FAILURE SRAMP-595
-//        assertEquals(artifact.getContentEncoding(), entry.getContent().getType().toString());
+        // TODO: The spec isn't clear on this.  The artifact content type should simply be application/xml,
+        // but the links are application/atom+xml;type='entry'.  *content* != *atom* link
+//        assertEquals(artifact.getContentType(), entry.getLinks().get(0).getType().toString());
+        assertEquals(artifact.getContentType() + ";charset=" + artifact.getContentEncoding(),
+                entry.getContent().getType().toString());
+        assertEquals(AtomBinding.BASE_URL + "/s-ramp/core/XmlDocument/" + artifact.getUuid(),
+                entry.getContent().getSrc().toString());
     }
 
     @Test
