@@ -87,12 +87,6 @@ public class Test_2_2 extends AbstractFoundationTest {
         
         artifact.getProperty().clear();
         
-        // Cannot duplicate relationship names.
-        artifact.getRelationship().add(relationship);
-        binding.upload(artifact, "/PO.xsd", 409);
-        
-        artifact.getRelationship().clear();
-        
         // Cannot duplicate built-in property names.
         relationship.setRelationshipType("description");
         artifact.getRelationship().add(relationship);
