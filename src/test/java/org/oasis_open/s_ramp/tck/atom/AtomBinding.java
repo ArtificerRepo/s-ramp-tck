@@ -341,9 +341,9 @@ public class AtomBinding extends Binding {
         
         // Atom 2.3.1
         assertTrue(entry.getCategories().size() > 0);
-        Category category = findCategory(SrampAtomConstants.X_S_RAMP_TYPE, entry);
-        assertNotNull(category);
-        if (category.getTerm().equals("query") || category.getTerm().equals("classification")) {
+        Category typeCategory = findCategory(SrampAtomConstants.X_S_RAMP_TYPE, entry);
+        assertNotNull(typeCategory);
+        if (typeCategory.getTerm().equals("query") || typeCategory.getTerm().equals("classification")) {
             // Do nothing: stored query or classification.
         } else {
             // Else, assume it's an artifact.
@@ -355,10 +355,18 @@ public class AtomBinding extends Binding {
             // TODO: Not sure if this is correct.  In Overlord, the term is the name of the extended type,
             // not "ExtendedArtifactType"
             if (! artifactType.isExtendedType()) {
-                assertEquals(artifactType.getArtifactType().getType(), category.getTerm());
+                assertEquals(artifactType.getArtifactType().getType(), typeCategory.getTerm());
+            }
+            
+            // verify :kind
+            Category kindCategory = findCategory(SrampAtomConstants.X_S_RAMP_KIND, entry);
+            assertNotNull(kindCategory);
+            if (artifactType.isDerived()) {
+                assertEquals("derived", kindCategory.getTerm());
+            } else {
+                assertEquals("modeled", kindCategory.getTerm());
             }
         }
-        // TODO: Test the "kind" category after SRAMP-596.  urn:x-sramp:2013:kind must be "derived", "modeled", or "generic"
     }
     
     private Category findCategory(String scheme, Entry entry) {
