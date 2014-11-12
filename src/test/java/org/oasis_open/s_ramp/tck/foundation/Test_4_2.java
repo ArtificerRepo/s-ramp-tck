@@ -115,9 +115,8 @@ public class Test_4_2 extends AbstractFoundationTest {
         verifyArtifacts(artifacts);
         
         // Example 7:  Query Expressions Using Relationships as Sub-Artifact Sets
-        // TODO FAILURE: SRAMP-548
-//        artifacts = binding.query("/s-ramp/wsdl/Message[@name='findRequest']/part");
-//        assertEquals(1, artifacts.size());
-//        verifyArtifacts(artifacts);
+        artifacts = binding.query("/s-ramp/wsdl/Message[@name='findRequest']/part");
+        assertEquals(1, artifacts.size());
+        verifyArtifacts(artifacts);
     }
 }

@@ -91,8 +91,9 @@ public class AtomBinding extends Binding {
 
     @Override
     public List<BaseArtifactType> query(String query) throws Exception {
+        String path = "/s-ramp?query=" + query;
         List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
-        Feed feed = getFeed(query);
+        Feed feed = getFeed(path);
         for (Entry entry : feed.getEntries()) {
             for (Link link : entry.getLinks()) {
                 // TODO: Safe assumption for all impls?
