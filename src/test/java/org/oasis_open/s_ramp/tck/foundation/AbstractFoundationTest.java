@@ -28,10 +28,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.DocumentArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.*;
 import org.oasis_open.s_ramp.tck.AbstractTest;
 import org.oasis_open.s_ramp.tck.Binding;
 import org.oasis_open.s_ramp.tck.BindingFactory;
@@ -86,6 +83,16 @@ public abstract class AbstractFoundationTest extends AbstractTest {
         for (Relationship relationship : artifact.getRelationship()) {
             assertFalse(names.contains(relationship.getRelationshipType()));
             names.add(relationship.getRelationshipType());
+
+            for (Target target : relationship.getRelationshipTarget()) {
+                assertNotNull(target.getValue());
+                assertTrue(target.getValue().length() > 0);
+                assertNotNull(target.getHref());
+                // Should be enough to ensure a full URL is present and pointing to the artifact.
+                assertTrue(target.getHref().startsWith("http"));
+                assertTrue(target.getHref().contains("s-ramp"));
+                assertTrue(target.getHref().endsWith(target.getValue()));
+            }
         }
         for (Property property : artifact.getProperty()) {
             assertFalse(names.contains(property.getPropertyName()));
