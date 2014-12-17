@@ -16,10 +16,11 @@
 package org.oasis_open.s_ramp.tck.foundation;
 
 import org.junit.Test;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Property;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.*;
+import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.Binding;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Brett Meyer
@@ -99,7 +100,27 @@ public class Test_2_2 extends AbstractFoundationTest {
         artifact.getRelationship().add(relationship);
         binding.upload(artifact, "/PO.xsd", 409);
     }
-    
-    // TODO: 2.2.2 Documents which have a Derived Model associated with them cannot be updated in the repository.  They must be removed and republished.
-    // TODO: 2.2.2 Documents which are the target of a relationship cannot be deleted.
+
+    @Test
+    public void test_2_2_2() throws Exception {
+        Task task = new Task();
+        task = (Task) binding.create(task);
+        verifyArtifact(task);
+        TaskTarget taskTarget = new TaskTarget();
+        taskTarget.setArtifactType(TaskEnum.TASK);
+        taskTarget.setValue(task.getUuid());
+        Actor actor = new Actor();
+        actor.getDoes().add(taskTarget);
+        actor = (Actor) binding.create(actor);
+        verifyArtifact(actor);
+
+        // Cannot delete an artifact that's targeted by a relationship
+        binding.delete(task, 409);
+
+        // Delete the relationship and retry
+        actor.getDoes().clear();
+        binding.update(actor);
+        binding.delete(task);
+        binding.get(task.getUuid(), ArtifactType.valueOf(task), 404);
+    }
 }

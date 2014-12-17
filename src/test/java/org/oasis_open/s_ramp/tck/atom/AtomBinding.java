@@ -69,7 +69,8 @@ public class AtomBinding extends Binding {
     public BaseArtifactType get(String uuid, ArtifactType type) throws Exception {
         return get(uuid, type, 200);
     }
-    
+
+    @Override
     public BaseArtifactType get(String uuid, ArtifactType type, int expectedResponse) throws Exception {
         String atomUrl = getUrl(type) + "/" + uuid;
         Entry entry = getArtifact(atomUrl, expectedResponse);
@@ -212,11 +213,11 @@ public class AtomBinding extends Binding {
     }
     
     @Override
-    public void update(BaseArtifactType artifact) throws Exception {
-        update(artifact, 204);
+    public BaseArtifactType update(BaseArtifactType artifact) throws Exception {
+        return update(artifact, 204);
     }
     
-    public void update(BaseArtifactType artifact, int expectedResponse) throws Exception {
+    public BaseArtifactType update(BaseArtifactType artifact, int expectedResponse) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType) + "/" + artifact.getUuid();
         
@@ -224,6 +225,8 @@ public class AtomBinding extends Binding {
         Response response = clientRequest.put(Entity.entity(SrampAtomUtils.wrapSrampArtifact(artifact),
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         verifyResponse(response, expectedResponse);
+
+        return get(artifact.getUuid(), artifactType);
     }
     
     @Override
@@ -233,6 +236,19 @@ public class AtomBinding extends Binding {
         Builder clientRequest = getClientRequest(BASE_URL + "/s-ramp/ontology");
         Response response = clientRequest.post(Entity.entity(is, MediaType.APPLICATION_RDF_XML));
         verifyResponse(response, 200);
+    }
+
+    @Override
+    public void delete(BaseArtifactType artifact) throws Exception {
+        delete(artifact, 204);
+    }
+
+    @Override
+    public void delete(BaseArtifactType artifact, int expectedResponse) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        String atomUrl = getUrl(artifactType) + "/" + artifact.getUuid();
+        Response response = getClientRequest(atomUrl).delete();
+        verifyResponse(response, expectedResponse);
     }
     
     @Override

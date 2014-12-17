@@ -18,11 +18,7 @@ package org.oasis_open.s_ramp.tck.foundation;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocumentEnum;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocumentTarget;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.*;
 import org.oasis_open.s_ramp.tck.Binding;
 
 /**
@@ -73,16 +69,30 @@ public class Test_2_1 extends AbstractFoundationTest {
         invalidRelationship.setRelationshipType("importedXsds");
         invalidRelationship.getRelationshipTarget().add(xsdTarget);
         xsd2.getRelationship().add(invalidRelationship);
-        
-        // TODO FAILURE: SRAMP-551 (either 0 relationships should result, or the upload should fail)
-//        xsd2Artifact = (XsdDocument) binding.upload(xsd2, "/PO.xsd");
-//        verifyArtifact(xsd2Artifact);
+
+        binding.upload(xsd2, "/PO.xsd", 409);
+
+        // reset
+        xsd2.getRelationship().remove(invalidRelationship);
         
         // test that a derived relationship cannot be created/edited
         xsd2.getImportedXsds().add(xsdTarget);
         binding.upload(xsd2, "/PO.xsd", 409);
-        
-        // TODO: Test modeled relationships between soa/serviceimpl after SRAMP-167
+
+        // test modeled relationship support
+        // TODO: cardinality assertions?
+        Task task = new Task();
+        task = (Task) binding.create(task);
+        verifyArtifact(task);
+        TaskTarget taskTarget = new TaskTarget();
+        taskTarget.setArtifactType(TaskEnum.TASK);
+        taskTarget.setValue(task.getUuid());
+        Actor actor = new Actor();
+        actor.getDoes().add(taskTarget);
+        actor = (Actor) binding.create(actor);
+        verifyArtifact(actor);
+        assertEquals(1, actor.getDoes().size());
+        assertEquals(task.getUuid(), actor.getDoes().get(0).getValue());
     }
 
 }

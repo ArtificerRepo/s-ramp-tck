@@ -375,7 +375,7 @@ public final class SrampAtomUtils {
      */
     public static StoredQuery unwrapStoredQuery(Entry entry) {
         try {
-            // TODO: Again, this is stupid.  StoredQuery and StoredQueryData should be combined.
+            // TODO: StoredQuery and StoredQueryData should be combined.
             StoredQueryData data = unwrap(entry, StoredQueryData.class);
             StoredQuery storedQuery = new StoredQuery();
             storedQuery.setQueryExpression(data.getQueryString());

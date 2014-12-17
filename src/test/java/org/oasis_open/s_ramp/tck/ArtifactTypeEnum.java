@@ -19,62 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Actor;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Artifact;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.AttributeDeclaration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactEnum;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Binding;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperation;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperationFault;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperationInput;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BindingOperationOutput;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Choreography;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ChoreographyProcess;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Collaboration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.CollaborationProcess;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ComplexTypeDeclaration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Composition;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Document;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Effect;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Element;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ElementDeclaration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Event;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Fault;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.InformationType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Message;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Operation;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.OperationInput;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.OperationOutput;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Orchestration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.OrchestrationProcess;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Organization;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Part;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Policy;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PolicyAttachment;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PolicyDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PolicyExpression;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PolicySubject;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Port;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.PortType;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Service;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceComposition;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceContract;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceEndpoint;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInstance;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceInterface;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ServiceOperation;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.SimpleTypeDeclaration;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.SoapAddress;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.SoapBinding;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Task;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlExtension;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.WsdlService;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XmlDocument;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
+import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.*;
 
 /**
  * An enum representing all of the Artifact Types defined by S-RAMP.
@@ -94,6 +39,7 @@ public enum ArtifactTypeEnum {
     ElementDeclaration("xsd", "XML Schema Element Declaration", ElementDeclaration.class, BaseArtifactEnum.ELEMENT_DECLARATION, true), //$NON-NLS-1$ //$NON-NLS-2$
     SimpleTypeDeclaration("xsd", "XML Schema Simple Type Declaration", SimpleTypeDeclaration.class, BaseArtifactEnum.SIMPLE_TYPE_DECLARATION, true), //$NON-NLS-1$ //$NON-NLS-2$
     ComplexTypeDeclaration("xsd", "XML Schema Complex Type Declaration", ComplexTypeDeclaration.class, BaseArtifactEnum.COMPLEX_TYPE_DECLARATION, true), //$NON-NLS-1$ //$NON-NLS-2$
+    XsdType("xsd", "XML Schema Type Declaration", org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdType.class, BaseArtifactEnum.XSD_TYPE, true), //$NON-NLS-1$ //$NON-NLS-2$
     // Policy
     PolicyDocument("policy", "Policy", PolicyDocument.class, BaseArtifactEnum.POLICY_DOCUMENT, false, true), //$NON-NLS-1$ //$NON-NLS-2$
     PolicyExpression("policy", "Policy Expression", PolicyExpression.class, BaseArtifactEnum.POLICY_EXPRESSION, true), //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,13 +59,12 @@ public enum ArtifactTypeEnum {
     Operation("wsdl", "WSDL Operation", Operation.class, BaseArtifactEnum.OPERATION, true), //$NON-NLS-1$ //$NON-NLS-2$
     OperationInput("wsdl", "WSDL Operation Input", OperationInput.class, BaseArtifactEnum.OPERATION_INPUT, true), //$NON-NLS-1$ //$NON-NLS-2$
     OperationOutput("wsdl", "WSDL Operation Output", OperationOutput.class, BaseArtifactEnum.OPERATION_OUTPUT, true), //$NON-NLS-1$ //$NON-NLS-2$
-    Binding("wsdl", "WSDL Binding", Binding.class, BaseArtifactEnum.BINDING, true), //$NON-NLS-1$ //$NON-NLS-2$
+    Binding("wsdl", "WSDL Binding", org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Binding.class, BaseArtifactEnum.BINDING, true), //$NON-NLS-1$ //$NON-NLS-2$
     BindingOperation("wsdl", "WSDL Binding Operation", BindingOperation.class, BaseArtifactEnum.BINDING_OPERATION, true), //$NON-NLS-1$ //$NON-NLS-2$
     BindingOperationInput("wsdl", "WSDL Binding Operation Input", BindingOperationInput.class, BaseArtifactEnum.BINDING_OPERATION_INPUT, true), //$NON-NLS-1$ //$NON-NLS-2$
     BindingOperationOutput("wsdl", "WSDL Binding Operation Output", BindingOperationOutput.class, BaseArtifactEnum.BINDING_OPERATION_OUTPUT, true), //$NON-NLS-1$ //$NON-NLS-2$
     BindingOperationFault("wsdl", "WSDL Binding Operation Fault", BindingOperationFault.class, BaseArtifactEnum.BINDING_OPERATION_FAULT, true), //$NON-NLS-1$ //$NON-NLS-2$
     // Service Implementation
-    Organization("serviceImplementation", "Organization", Organization.class, BaseArtifactEnum.ORGANIZATION, false), //$NON-NLS-1$ //$NON-NLS-2$
     ServiceEndpoint("serviceImplementation", "Service Endpoint", ServiceEndpoint.class, BaseArtifactEnum.SERVICE_ENDPOINT, false), //$NON-NLS-1$ //$NON-NLS-2$
     ServiceInstance("serviceImplementation", "Service Instance", ServiceInstance.class, BaseArtifactEnum.SERVICE_INSTANCE, false), //$NON-NLS-1$ //$NON-NLS-2$
     ServiceOperation("serviceImplementation", "Service Operation", ServiceOperation.class, BaseArtifactEnum.SERVICE_OPERATION, false), //$NON-NLS-1$ //$NON-NLS-2$
@@ -127,7 +72,7 @@ public enum ArtifactTypeEnum {
     ExtendedArtifactType("ext", "Extended Artifact Type", ExtendedArtifactType.class, BaseArtifactEnum.EXTENDED_ARTIFACT_TYPE, false), //$NON-NLS-1$ //$NON-NLS-2$
     ExtendedDocument("ext", "Extended Document", ExtendedDocument.class, BaseArtifactEnum.EXTENDED_DOCUMENT, false, true), //$NON-NLS-1$ //$NON-NLS-2$
     // SOA
-    HumanActor("soa", "SOA Human Actor", Actor.class, BaseArtifactEnum.ACTOR, false), //$NON-NLS-1$ //$NON-NLS-2$
+    Actor("soa", "SOA Actor", Actor.class, BaseArtifactEnum.ACTOR, false), //$NON-NLS-1$ //$NON-NLS-2$
     Choreography("soa", "SOA Choreography", Choreography.class, BaseArtifactEnum.CHOREOGRAPHY, false), //$NON-NLS-1$ //$NON-NLS-2$
     ChoreographyProcess("soa", "SOA Choreography Process", ChoreographyProcess.class, BaseArtifactEnum.CHOREOGRAPHY_PROCESS, false), //$NON-NLS-1$ //$NON-NLS-2$
     Collaboration("soa", "SOA Collaboration", Collaboration.class, BaseArtifactEnum.COLLABORATION, false), //$NON-NLS-1$ //$NON-NLS-2$
@@ -139,6 +84,7 @@ public enum ArtifactTypeEnum {
     InformationType("soa", "SOA Information Type", InformationType.class, BaseArtifactEnum.INFORMATION_TYPE, false), //$NON-NLS-1$ //$NON-NLS-2$
     Orchestration("soa", "SOA Orchestration", Orchestration.class, BaseArtifactEnum.ORCHESTRATION, false), //$NON-NLS-1$ //$NON-NLS-2$
     OrchestrationProcess("soa", "SOA Orchestration Process", OrchestrationProcess.class, BaseArtifactEnum.ORCHESTRATION_PROCESS, false), //$NON-NLS-1$ //$NON-NLS-2$
+    Organization("serviceImplementation", "SOA Organization", Organization.class, BaseArtifactEnum.ORGANIZATION, false), //$NON-NLS-1$ //$NON-NLS-2$
     Policy("soa", "SOA Policy", Policy.class, BaseArtifactEnum.POLICY, false), //$NON-NLS-1$ //$NON-NLS-2$
     PolicySubject("soa", "SOA Policy Subject", PolicySubject.class, BaseArtifactEnum.POLICY_SUBJECT, false), //$NON-NLS-1$ //$NON-NLS-2$
     Process("soa", "SOA Process", org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Process.class, BaseArtifactEnum.PROCESS, false), //$NON-NLS-1$ //$NON-NLS-2$
@@ -230,8 +176,8 @@ public enum ArtifactTypeEnum {
      * Called to unwrap the S-RAMP artifact from its wrapper.
      * @param artifactWrapper the S-RAMP artifact wrapper
      * @return the specific artifact based on type
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
+     * @throws SecurityException
+     * @throws NoSuchMethodException
      */
     public BaseArtifactType unwrap(Artifact artifactWrapper) throws Exception {
         Method method = Artifact.class.getMethod("get" + this.name()); //$NON-NLS-1$

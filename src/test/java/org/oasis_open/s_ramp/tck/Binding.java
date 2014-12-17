@@ -27,6 +27,8 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.StoredQuery;
 public abstract class Binding {
     
     public abstract BaseArtifactType get(String uuid, ArtifactType type) throws Exception;
+
+    public abstract BaseArtifactType get(String uuid, ArtifactType type, int expectedResponse) throws Exception;
     
     public abstract List<BaseArtifactType> query(String query) throws Exception;
     
@@ -40,9 +42,13 @@ public abstract class Binding {
     
     public abstract BaseArtifactType upload(BaseArtifactType artifact, String filePath, int expectedResponse) throws Exception;
     
-    public abstract void update(BaseArtifactType artifact) throws Exception;
+    public abstract BaseArtifactType update(BaseArtifactType artifact) throws Exception;
     
     public abstract void uploadOntology(String filePath) throws Exception;
+
+    public abstract void delete(BaseArtifactType artifact) throws Exception;
+
+    public abstract void delete(BaseArtifactType artifact, int expectedResponse) throws Exception;
     
     public abstract void deleteAll() throws Exception;
     
