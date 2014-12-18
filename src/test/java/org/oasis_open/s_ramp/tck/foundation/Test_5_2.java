@@ -126,7 +126,10 @@ public class Test_5_2 extends AbstractFoundationTest {
     @Test
     public void testLogicalModels() throws Exception {
         // Just need some sort of derived artifact to target
-        binding.upload(XsdDocument(), "/PO.xsd");
+        BaseArtifactType baseArtifact = binding.upload(XsdDocument(), "/PO.xsd");
+        BaseArtifactTarget baseArtifactTarget = new BaseArtifactTarget();
+        baseArtifactTarget.setArtifactType(BaseArtifactEnum.XSD_DOCUMENT);
+        baseArtifactTarget.setValue(baseArtifact.getUuid());
         BaseArtifactType derivedArtifact = binding.query("/s-ramp/xsd/SimpleTypeDeclaration").get(0);
         DerivedArtifactTarget derivedArtifactTarget = new DerivedArtifactTarget();
         derivedArtifactTarget.setArtifactType(DerivedArtifactEnum.SIMPLE_TYPE_DECLARATION);
@@ -283,10 +286,8 @@ public class Test_5_2 extends AbstractFoundationTest {
 
         serviceEndpoint.setEndpointDefinedBy(derivedArtifactTarget);
 
-        // TODO: Doesn't make sense -- should be something other than ServiceInstanceTarget
-        serviceInstance.getDescribedBy().add(serviceInstanceTarget);
-        // TODO: Doesn't make sense -- should be something other than ServiceInstanceTarget
-        serviceInstance.getUses().add(serviceInstanceTarget);
+        serviceInstance.getDescribedBy().add(baseArtifactTarget);
+        serviceInstance.getUses().add(baseArtifactTarget);
         serviceInstance = (ServiceInstance) binding.update(serviceInstance);
 
         serviceInterface.setHasOperation(serviceOperationTarget);
@@ -344,8 +345,8 @@ public class Test_5_2 extends AbstractFoundationTest {
         assertEquals(actor.getUuid(), serviceContract.getInvolvesParty().get(0).getValue());
         assertEquals(effect.getUuid(), serviceContract.getSpecifies().get(0).getValue());
         assertEquals(derivedArtifact.getUuid(), serviceEndpoint.getEndpointDefinedBy().getValue());
-        assertEquals(serviceInstance.getUuid(), serviceInstance.getDescribedBy().get(0).getValue());
-        assertEquals(serviceInstance.getUuid(), serviceInstance.getUses().get(0).getValue());
+        assertEquals(baseArtifact.getUuid(), serviceInstance.getDescribedBy().get(0).getValue());
+        assertEquals(baseArtifact.getUuid(), serviceInstance.getUses().get(0).getValue());
         assertEquals(serviceOperation.getUuid(), serviceInterface.getHasOperation().getValue());
         assertEquals(service.getUuid(), serviceInterface.getIsInterfaceOf().get(0).getValue());
         assertEquals(informationType.getUuid(), serviceInterface.getHasInput().get(0).getValue());
