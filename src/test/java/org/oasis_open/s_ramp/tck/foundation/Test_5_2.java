@@ -185,6 +185,9 @@ public class Test_5_2 extends AbstractFoundationTest {
 
         OrchestrationProcess orchestrationProcess = new OrchestrationProcess();
         orchestrationProcess = (OrchestrationProcess) binding.create(orchestrationProcess);
+        OrchestrationProcessTarget orchestrationProcessTarget = new OrchestrationProcessTarget();
+        orchestrationProcessTarget.setArtifactType(OrchestrationProcessEnum.ORCHESTRATION_PROCESS);
+        orchestrationProcessTarget.setValue(orchestrationProcess.getUuid());
 
         Organization organization = new Organization();
         organization = (Organization) binding.create(organization);
@@ -258,7 +261,7 @@ public class Test_5_2 extends AbstractFoundationTest {
         actor.getSetsPolicy().add(policyTarget);
 
         element.setDirectsOrchestration(orchestrationTarget);
-        element.setDirectsOrchestrationProcess(orchestrationTarget);
+        element.setDirectsOrchestrationProcess(orchestrationProcessTarget);
         element.getUses().add(elementTarget);
         element.getGenerates().add(eventTarget);
         element.getPerforms().add(serviceTarget);
@@ -327,7 +330,7 @@ public class Test_5_2 extends AbstractFoundationTest {
         assertEquals(task.getUuid(), actor.getDoes().get(0).getValue());
         assertEquals(policy.getUuid(), actor.getSetsPolicy().get(0).getValue());
         assertEquals(orchestration.getUuid(), element.getDirectsOrchestration().getValue());
-        assertEquals(orchestration.getUuid(), element.getDirectsOrchestrationProcess().getValue());
+        assertEquals(orchestrationProcess.getUuid(), element.getDirectsOrchestrationProcess().getValue());
         assertEquals(element.getUuid(), element.getUses().get(0).getValue());
         assertEquals(event.getUuid(), element.getGenerates().get(0).getValue());
         assertEquals(service.getUuid(), element.getPerforms().get(0).getValue());
