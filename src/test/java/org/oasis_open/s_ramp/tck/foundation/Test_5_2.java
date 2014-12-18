@@ -287,8 +287,7 @@ public class Test_5_2 extends AbstractFoundationTest {
         serviceInstance = (ServiceInstance) binding.update(serviceInstance);
 
         serviceInterface.setHasOperation(serviceOperationTarget);
-        // TODO: This must be a Target!
-//        serviceInterface.setInterfaceDefinedBy(derivedArtifactTarget);
+        serviceInterface.setInterfaceDefinedBy(derivedArtifactTarget);
         serviceInterface.getIsInterfaceOf().add(serviceTarget);
         serviceInterface.getHasInput().add(informationTypeTarget);
         serviceInterface.getHasOutput().add(informationTypeTarget);
