@@ -226,7 +226,7 @@ public class AtomBinding extends Binding {
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         verifyResponse(response, expectedResponse);
 
-        return get(artifact.getUuid(), artifactType);
+        return get(artifact.getUuid(), artifactType, expectedResponse == 204 ? 200 : expectedResponse);
     }
     
     @Override
@@ -400,7 +400,7 @@ public class AtomBinding extends Binding {
 //        private static final String USERNAME = System.getProperty("username");
 //        private static final String PASSWORD = System.getProperty("password");
         private static final String USERNAME = "admin";
-        private static final String PASSWORD = "overlord1!";
+        private static final String PASSWORD = "artificer1!";
 
         @Override
         public void filter(ClientRequestContext requestContext) throws IOException {
