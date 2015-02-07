@@ -94,7 +94,7 @@ public class AtomBinding extends Binding {
     public List<BaseArtifactType> query(String query) throws Exception {
         String path = "/s-ramp?query=" + query;
         List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
-        Feed feed = getFeed(path);
+        Feed feed = getFeed(path, 200);
         for (Entry entry : feed.getEntries()) {
             artifacts.add(SrampAtomUtils.unwrapSrampArtifact(entry));
         }
@@ -105,7 +105,7 @@ public class AtomBinding extends Binding {
     public List<BaseArtifactType> queryFullArtifacts(String query) throws Exception {
         String path = "/s-ramp?query=" + query;
         List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
-        Feed feed = getFeed(path);
+        Feed feed = getFeed(path, 200);
         for (Entry entry : feed.getEntries()) {
             for (Link link : entry.getLinks()) {
                 // TODO: Safe assumption for all impls?
@@ -116,41 +116,62 @@ public class AtomBinding extends Binding {
         }
         return artifacts;
     }
+
+    @Override
+    public List<BaseArtifactType> storedQuery(String queryName, String pagingParams, int expectedResponse) throws Exception {
+        String path = "/s-ramp/query/" + queryName + "/results?" + pagingParams;
+        List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
+        Feed feed = getFeed(path, expectedResponse);
+        if (feed != null) {
+            for (Entry entry : feed.getEntries()) {
+                artifacts.add(SrampAtomUtils.unwrapSrampArtifact(entry));
+            }
+        }
+        return artifacts;
+    }
     
     @Override
     public BaseArtifactType create(BaseArtifactType artifact) throws Exception {
         ArtifactType artifactType = ArtifactType.valueOf(artifact);
         String atomUrl = getUrl(artifactType);
-        Entry entry = create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact));
+        Response response = create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact), 200);
+        Entry entry = response.readEntity(Entry.class);
+        verifyEntry(entry);
         return SrampAtomUtils.unwrapSrampArtifact(artifactType, entry);
     }
-    
+
     @Override
     public StoredQuery create(StoredQuery storedQuery) throws Exception {
+        return create(storedQuery, 200);
+    }
+
+    @Override
+    public StoredQuery create(StoredQuery storedQuery, int expectedResponse) throws Exception {
         String atomUrl = BASE_URL + "/s-ramp/query";
-        Entry entry = create(atomUrl, SrampAtomUtils.wrapStoredQuery(storedQuery));
-        return SrampAtomUtils.unwrapStoredQuery(entry);
+        Builder clientRequest = getClientRequest(atomUrl);
+        Response response = clientRequest.post(Entity.entity(SrampAtomUtils.wrapStoredQuery(storedQuery),
+                MediaType.APPLICATION_ATOM_XML_ENTRY));
+        boolean continueProcessing = verifyResponse(response, expectedResponse);
+        if (continueProcessing) {
+            Entry entry = response.readEntity(Entry.class);
+            return SrampAtomUtils.unwrapStoredQuery(entry);
+        } else {
+            return null;
+        }
+    }
+
+    public Response create(BaseArtifactType artifact, int expectedResponse) throws Exception {
+        ArtifactType artifactType = ArtifactType.valueOf(artifact);
+        String atomUrl = getUrl(artifactType);
+        return create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact), expectedResponse);
     }
     
-    public Entry create(String atomUrl, Entry entry) {
-        Response response = create(atomUrl, entry, 200);
-        entry = response.readEntity(Entry.class);
-        verifyEntry(entry);
-        return entry;
-    }
-    
-    public Response create(String atomUrl, Entry entry, int expectedResponse) {
+    private Response create(String atomUrl, Entry entry, int expectedResponse) {
         Builder clientRequest = getClientRequest(atomUrl);
         Response response = clientRequest.post(Entity.entity(entry,
                 MediaType.APPLICATION_ATOM_XML_ENTRY));
         verifyResponse(response, expectedResponse);
         return response;
-    }
-    
-    public Response create(BaseArtifactType artifact, int expectedResponse) throws Exception {
-        ArtifactType artifactType = ArtifactType.valueOf(artifact);
-        String atomUrl = getUrl(artifactType);
-        return create(atomUrl, SrampAtomUtils.wrapSrampArtifact(artifact), expectedResponse);
     }
 
     @Override
@@ -264,7 +285,7 @@ public class AtomBinding extends Binding {
     
     @Override
     public void deleteAll() throws Exception {
-        Feed feed = getFeed("/s-ramp?query=/s-ramp&startIndex=0&count=10000");
+        Feed feed = getFeed("/s-ramp?query=/s-ramp&startIndex=0&count=10000", 200);
         for (Entry entry : feed.getEntries()) {
             // Delete all primary artifacts
             if (entry.getExtensionAttributes().containsKey(DERIVED_QNAME)
@@ -278,14 +299,14 @@ public class AtomBinding extends Binding {
             }
         }
         
-        feed = getFeed("/s-ramp/query");
+        feed = getFeed("/s-ramp/query", 200);
         for (Entry entry : feed.getEntries()) {
             String queryName = entry.getId().toString().replace("urn:uuid:", "");
             getClientRequest(BASE_URL + "/s-ramp/query/" + queryName).delete();
         }
         
         // TODO: This may not be required by the spec.
-        feed = getFeed("/s-ramp/ontology");
+        feed = getFeed("/s-ramp/ontology", 200);
         for (Entry entry : feed.getEntries()) {
             String uuid = entry.getId().toString().replace("urn:uuid:", "");
             getClientRequest(BASE_URL + "/s-ramp/ontology/" + uuid).delete();
@@ -305,11 +326,17 @@ public class AtomBinding extends Binding {
                 artifactType.getArtifactType().getModel(), type);
     }
 
-    private Feed getFeed(String endpoint) {
+    private Feed getFeed(String endpoint, int expectedResponse) {
         Builder clientRequest = getClientRequest(BASE_URL + endpoint);
-        Feed feed = clientRequest.get(Feed.class);
-        verifyFeed(feed);
-        return feed;
+        Response response = clientRequest.get();
+        boolean continueProcessing = verifyResponse(response, expectedResponse);
+        if (continueProcessing) {
+            Feed feed = response.readEntity(Feed.class);
+            verifyFeed(feed);
+            return feed;
+        } else {
+            return null;
+        }
     }
     
     private Entry getArtifact(String url, int expectedResponse) {

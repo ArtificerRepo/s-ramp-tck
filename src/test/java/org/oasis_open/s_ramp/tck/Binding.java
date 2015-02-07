@@ -33,10 +33,14 @@ public abstract class Binding {
     public abstract List<BaseArtifactType> query(String query) throws Exception;
     
     public abstract List<BaseArtifactType> queryFullArtifacts(String query) throws Exception;
+
+    public abstract List<BaseArtifactType> storedQuery(String queryName, String pagingParams, int expectedResponse) throws Exception;
     
     public abstract BaseArtifactType create(BaseArtifactType artifact) throws Exception;
     
     public abstract StoredQuery create(StoredQuery storedQuery) throws Exception;
+
+    public abstract StoredQuery create(StoredQuery storedQuery, int expectedResponse) throws Exception;
     
     public abstract BaseArtifactType upload(ArtifactType artifactType, String filePath) throws Exception;
     
