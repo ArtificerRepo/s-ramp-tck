@@ -29,8 +29,10 @@ public abstract class Binding {
     public abstract BaseArtifactType get(String uuid, ArtifactType type) throws Exception;
 
     public abstract BaseArtifactType get(String uuid, ArtifactType type, int expectedResponse) throws Exception;
-    
+
     public abstract List<BaseArtifactType> query(String query) throws Exception;
+    
+    public abstract List<BaseArtifactType> queryFullArtifacts(String query) throws Exception;
     
     public abstract BaseArtifactType create(BaseArtifactType artifact) throws Exception;
     

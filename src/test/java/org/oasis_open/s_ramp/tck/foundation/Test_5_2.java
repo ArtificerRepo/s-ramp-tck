@@ -66,10 +66,10 @@ public class Test_5_2 extends AbstractFoundationTest {
         artifact = binding.get(artifact.getUuid(), ArtifactType.XsdDocument());
         verifyArtifact(artifact, XsdDocument.class);
 
-        verifyArtifacts(binding.query("/s-ramp/xsd/ElementDeclaration"), ElementDeclaration.class);
-        verifyArtifacts(binding.query("/s-ramp/xsd/AttributeDeclaration"), AttributeDeclaration.class);
-        verifyArtifacts(binding.query("/s-ramp/xsd/ComplexTypeDeclaration"), ComplexTypeDeclaration.class);
-        verifyArtifacts(binding.query("/s-ramp/xsd/SimpleTypeDeclaration"), SimpleTypeDeclaration.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/xsd/ElementDeclaration"), ElementDeclaration.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/xsd/AttributeDeclaration"), AttributeDeclaration.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/xsd/ComplexTypeDeclaration"), ComplexTypeDeclaration.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/xsd/SimpleTypeDeclaration"), SimpleTypeDeclaration.class);
     }
 
     @Test
@@ -79,24 +79,24 @@ public class Test_5_2 extends AbstractFoundationTest {
         artifact = binding.get(artifact.getUuid(), ArtifactType.WsdlDocument());
         verifyArtifact(artifact, WsdlDocument.class);
 
-        verifyArtifacts(binding.query("/s-ramp/wsdl/WsdlService"), WsdlService.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Port"), Port.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Binding"), org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Binding.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/PortType"), PortType.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/BindingOperation"), BindingOperation.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/BindingOperationInput"), BindingOperationInput.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/BindingOperationFault"), BindingOperationFault.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/BindingOperationOutput"), BindingOperationOutput.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Operation"), Operation.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/OperationInput"), OperationInput.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/OperationOutput"), OperationOutput.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Fault"), Fault.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Message"), Message.class);
-        verifyArtifacts(binding.query("/s-ramp/wsdl/Part"), Part.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/WsdlService"), WsdlService.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Port"), Port.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Binding"), org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Binding.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/PortType"), PortType.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/BindingOperation"), BindingOperation.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/BindingOperationInput"), BindingOperationInput.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/BindingOperationFault"), BindingOperationFault.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/BindingOperationOutput"), BindingOperationOutput.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Operation"), Operation.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/OperationInput"), OperationInput.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/OperationOutput"), OperationOutput.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Fault"), Fault.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Message"), Message.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/wsdl/Part"), Part.class);
 
         // include the SOAP WSDL Model
-        verifyArtifacts(binding.query("/s-ramp/soapwsdl/SoapAddress"), SoapAddress.class);
-        verifyArtifacts(binding.query("/s-ramp/soapwsdl/SoapBinding"), SoapBinding.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/soapwsdl/SoapAddress"), SoapAddress.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/soapwsdl/SoapBinding"), SoapBinding.class);
     }
 
     @Test
@@ -104,8 +104,8 @@ public class Test_5_2 extends AbstractFoundationTest {
         BaseArtifactType artifact = binding.upload(WsdlDocument(), "/deriver.wsdl");
         verifyArtifact(artifact, WsdlDocument.class);
 
-        verifyArtifacts(binding.query("/s-ramp/soapwsdl/SoapAddress"), SoapAddress.class);
-        verifyArtifacts(binding.query("/s-ramp/soapwsdl/SoapBinding"), SoapBinding.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/soapwsdl/SoapAddress"), SoapAddress.class);
+        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/soapwsdl/SoapBinding"), SoapBinding.class);
     }
 
     @Test
@@ -119,8 +119,8 @@ public class Test_5_2 extends AbstractFoundationTest {
         verifyArtifact(artifact, WsdlDocument.class);
 
         // TODO FAILURE: SRAMP-89
-//        verifyArtifacts(binding.query("/s-ramp/policy/PolicyAttachment"), PolicyAttachment.class);
-//        verifyArtifacts(binding.query("/s-ramp/policy/PolicyExpression"), PolicyExpression.class);
+//        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/policy/PolicyAttachment"), PolicyAttachment.class);
+//        verifyArtifacts(binding.queryFullArtifacts("/s-ramp/policy/PolicyExpression"), PolicyExpression.class);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class Test_5_2 extends AbstractFoundationTest {
         BaseArtifactTarget baseArtifactTarget = new BaseArtifactTarget();
         baseArtifactTarget.setArtifactType(BaseArtifactEnum.XSD_DOCUMENT);
         baseArtifactTarget.setValue(baseArtifact.getUuid());
-        BaseArtifactType derivedArtifact = binding.query("/s-ramp/xsd/SimpleTypeDeclaration").get(0);
+        BaseArtifactType derivedArtifact = binding.queryFullArtifacts("/s-ramp/xsd/SimpleTypeDeclaration").get(0);
         DerivedArtifactTarget derivedArtifactTarget = new DerivedArtifactTarget();
         derivedArtifactTarget.setArtifactType(DerivedArtifactEnum.SIMPLE_TYPE_DECLARATION);
         derivedArtifactTarget.setValue(derivedArtifact.getUuid());

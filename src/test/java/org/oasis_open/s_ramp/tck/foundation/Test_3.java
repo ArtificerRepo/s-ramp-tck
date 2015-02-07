@@ -56,13 +56,13 @@ public class Test_3 extends AbstractFoundationTest {
         
         // TODO: Technically optional in the spec conformance section, but *shouldn't* be.  Will hopefully be required
         // in future versions.
-        List<BaseArtifactType> artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Europe')]");
+        List<BaseArtifactType> artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Europe')]");
         verifyArtifacts(artifacts);
         assertEquals(2, artifacts.size());
-        artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Asia')]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Asia')]");
         verifyArtifacts(artifacts);
         assertEquals(1, artifacts.size());
-        artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'World')]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'World')]");
         verifyArtifacts(artifacts);
         assertEquals(3, artifacts.size());
 
@@ -73,11 +73,11 @@ public class Test_3 extends AbstractFoundationTest {
         binding.update(artifact2);
         binding.update(artifact3);
         
-        artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Europe')]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Europe')]");
         assertEquals(0, artifacts.size());
-        artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Asia')]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'Asia')]");
         assertEquals(0, artifacts.size());
-        artifacts = binding.query("/s-ramp/ext/FooType[classifiedByAnyOf(., 'World')]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/FooType[classifiedByAnyOf(., 'World')]");
         assertEquals(0, artifacts.size());
     }
 }

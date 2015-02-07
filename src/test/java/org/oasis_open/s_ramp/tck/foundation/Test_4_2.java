@@ -38,7 +38,7 @@ public class Test_4_2 extends AbstractFoundationTest {
     
     @Test
     public void test_examples() throws Exception {
-        // Create with *and* without the name to verify the query works as expected.
+        // Create with *and* without the name to verify the queryFullArtifacts works as expected.
         BaseArtifactType artifact = XsdDocument();
         // TODO: Overlord S-RAMP requires that the slug name *or* the artifact name be set to the filename.  We use
         // this to resolve derived relationships between artifacts and schemas.
@@ -56,7 +56,7 @@ public class Test_4_2 extends AbstractFoundationTest {
         artifact.getProperty().add(property);
         verifyArtifact(binding.upload(artifact, "/ws-humantask-types.xsd"));
         
-        // Create with *and* without the property to verify the query works as expected.
+        // Create with *and* without the property to verify the queryFullArtifacts works as expected.
         artifact = new ServiceInstance();
         verifyArtifact(binding.create(artifact));
         artifact = new ServiceInstance();
@@ -66,56 +66,56 @@ public class Test_4_2 extends AbstractFoundationTest {
         artifact.getProperty().add(property);
         verifyArtifact(binding.create(artifact));
 
-        // Create with *and* without the name to verify the query works as expected.
+        // Create with *and* without the name to verify the queryFullArtifacts works as expected.
         artifact = ArtifactType.ExtendedArtifactType("BpmnDocument", false).newArtifactInstance();
         verifyArtifact(binding.create(artifact));
         artifact.setName("LoanApproval");
         verifyArtifact(binding.create(artifact));
         
-        // Create with *and* without the property to verify the query works as expected.
+        // Create with *and* without the property to verify the queryFullArtifacts works as expected.
         WsdlDocument wsdlArtifact = WsdlDocument();
         verifyArtifact(binding.upload(wsdlArtifact, "/deriver.wsdl")); // does not import an xsd
         wsdlArtifact.getProperty().add(property);
         verifyArtifact(binding.upload(wsdlArtifact, "/ws-humantask-api.wsdl")); // imports an xsd
         
         // Example 3:  Query Expressions Using Properties
-        List<BaseArtifactType> artifacts = binding.query("/s-ramp/xsd/XsdDocument[@someProperty]");
+        List<BaseArtifactType> artifacts = binding.queryFullArtifacts("/s-ramp/xsd/XsdDocument[@someProperty]");
         assertEquals(1, artifacts.size());
         assertEquals(1, artifacts.get(0).getProperty().size());
         assertEquals("someProperty", artifacts.get(0).getProperty().get(0).getPropertyName());
         verifyArtifacts(artifacts);
-        artifacts = binding.query("/s-ramp/xsd/XsdDocument[@name = 'bob']");
+        artifacts = binding.queryFullArtifacts("/s-ramp/xsd/XsdDocument[@name = 'bob']");
         assertEquals(1, artifacts.size());
         assertEquals("bob", artifacts.get(0).getName());
         verifyArtifacts(artifacts);
-        artifacts = binding.query("/s-ramp/serviceImplementation/ServiceInstance[@someProperty = 'high']");
+        artifacts = binding.queryFullArtifacts("/s-ramp/serviceImplementation/ServiceInstance[@someProperty = 'high']");
         assertEquals(1, artifacts.size());
         assertEquals(1, artifacts.get(0).getProperty().size());
         assertEquals("someProperty", artifacts.get(0).getProperty().get(0).getPropertyName());
         verifyArtifacts(artifacts);
         
         // Example 4:  Query Expression Using Relationships
-        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/wsdl/WsdlDocument[importedXsds]");
         assertEquals(1, artifacts.size());
         wsdlArtifact = (WsdlDocument) artifacts.get(0);
         assertEquals(1, wsdlArtifact.getImportedXsds().size());
         
         // Example 5:  Query Expression Using Relationships and Properties
-        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='high']]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='high']]");
         assertEquals(1, artifacts.size());
         wsdlArtifact = (WsdlDocument) artifacts.get(0);
         assertEquals(1, wsdlArtifact.getImportedXsds().size());
-        artifacts = binding.query("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='doesntexist']]");
+        artifacts = binding.queryFullArtifacts("/s-ramp/wsdl/WsdlDocument[importedXsds[@someProperty='doesntexist']]");
         assertEquals(0, artifacts.size());
         
         // Example 6:  Extended Artifacts
-        artifacts = binding.query("/s-ramp/ext/BpmnDocument[@name = 'LoanApproval']");
+        artifacts = binding.queryFullArtifacts("/s-ramp/ext/BpmnDocument[@name = 'LoanApproval']");
         assertEquals(1, artifacts.size());
         assertEquals("LoanApproval", artifacts.get(0).getName());
         verifyArtifacts(artifacts);
         
         // Example 7:  Query Expressions Using Relationships as Sub-Artifact Sets
-        artifacts = binding.query("/s-ramp/wsdl/Message[@name='findRequest']/part");
+        artifacts = binding.queryFullArtifacts("/s-ramp/wsdl/Message[@name='findRequest']/part");
         assertEquals(1, artifacts.size());
         verifyArtifacts(artifacts);
     }
