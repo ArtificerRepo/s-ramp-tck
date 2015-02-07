@@ -96,6 +96,17 @@ public class AtomBinding extends Binding {
         List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
         Feed feed = getFeed(path);
         for (Entry entry : feed.getEntries()) {
+            artifacts.add(SrampAtomUtils.unwrapSrampArtifact(entry));
+        }
+        return artifacts;
+    }
+
+    @Override
+    public List<BaseArtifactType> queryFullArtifacts(String query) throws Exception {
+        String path = "/s-ramp?query=" + query;
+        List<BaseArtifactType> artifacts = new ArrayList<BaseArtifactType>();
+        Feed feed = getFeed(path);
+        for (Entry entry : feed.getEntries()) {
             for (Link link : entry.getLinks()) {
                 // TODO: Safe assumption for all impls?
                 if ("self".equals(link.getRel())) {
@@ -293,7 +304,7 @@ public class AtomBinding extends Binding {
         return String.format("%1$s/%2$s/%3$s", BASE_URL + "/s-ramp",
                 artifactType.getArtifactType().getModel(), type);
     }
-    
+
     private Feed getFeed(String endpoint) {
         Builder clientRequest = getClientRequest(BASE_URL + endpoint);
         Feed feed = clientRequest.get(Feed.class);
