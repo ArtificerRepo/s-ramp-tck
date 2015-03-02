@@ -15,24 +15,6 @@
  */
 package org.oasis_open.s_ramp.tck.atom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
-
 import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -49,6 +31,23 @@ import org.oasis_open.s_ramp.tck.Binding;
 import org.oasis_open.s_ramp.tck.MediaType;
 import org.oasis_open.s_ramp.tck.SrampAtomConstants;
 
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Provides an Atom binding for the Foundational spec tests.  In addition, this provides coverage of much of the
  * Atom binding spec, where possible.  Additional coverage is provided by the tests in the *.atom package.
@@ -58,7 +57,7 @@ import org.oasis_open.s_ramp.tck.SrampAtomConstants;
 public class AtomBinding extends Binding {
     
 //    public static final String BASE_URL = System.getProperty("password");
-    public static final String BASE_URL = "http://localhost:8080/s-ramp-server";
+    public static final String BASE_URL = "http://localhost:8080/artificer-server";
 
     private static final QName DERIVED_QNAME = new QName(
             "http://docs.oasis-open.org/s-ramp/ns/s-ramp-v1.0", "derived", "s-ramp");
