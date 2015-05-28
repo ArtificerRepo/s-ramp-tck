@@ -15,29 +15,27 @@
  */
 package org.oasis_open.s_ramp.tck.atom;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.GregorianCalendar;
-import java.util.UUID;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.core.Response;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.jboss.resteasy.plugins.providers.atom.Entry;
 import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.junit.Test;
-import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.BaseArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.ExtendedArtifactType;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Relationship;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.Target;
 import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XmlDocument;
 import org.oasis_open.s_ramp.tck.ArtifactType;
 import org.oasis_open.s_ramp.tck.MediaType;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.core.Response;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Brett Meyer
@@ -134,12 +132,5 @@ public class Test_2_3 extends AbstractAtomTest {
     public void test_2_3_5_3() throws Exception {
         // A non-existent artifact cannot be retrieved.
         binding.get(UUID.randomUUID().toString(), ArtifactType.ExtendedArtifactType("FooType", false), 404);
-        
-        BaseArtifactType artifact = ExtendedArtifactType("FooType");
-        artifact.setName("FooName");
-        artifact = binding.create(artifact);
-        
-        // Nor can it be retrieved from the incorrect model.
-        binding.get(artifact.getUuid(), ArtifactType.PolicyDocument(), 404);
     }
 }
